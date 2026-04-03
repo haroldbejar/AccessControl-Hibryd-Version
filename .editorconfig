@@ -1,0 +1,49 @@
+# .editorconfig
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{cs,csx,vb,vbx}]
+indent_size = 4
+end_of_line = crlf
+
+[*.{json,js,ts,tsx,jsx,yml,yaml}]
+indent_size = 2
+
+# C# Coding Conventions
+[*.cs]
+
+# Prefer "var" when type is obvious
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+# Prefer method-like constructs to have a block body
+csharp_style_expression_bodied_methods = false:none
+csharp_style_expression_bodied_constructors = false:none
+
+# Naming conventions
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.severity = warning
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.symbols = interface
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.style = begins_with_i
+
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.applicable_accessibilities = *
+
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# Private fields should start with _
+dotnet_naming_rule.private_fields_should_be_prefixed_with_underscore.severity = warning
+dotnet_naming_rule.private_fields_should_be_prefixed_with_underscore.symbols = private_field
+dotnet_naming_rule.private_fields_should_be_prefixed_with_underscore.style = underscore_prefix
+
+dotnet_naming_symbols.private_field.applicable_kinds = field
+dotnet_naming_symbols.private_field.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_prefix.required_prefix = _
+dotnet_naming_style.underscore_prefix.capitalization = camel_case
