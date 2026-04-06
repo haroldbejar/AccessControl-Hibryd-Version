@@ -67,7 +67,7 @@ public sealed class VisitsController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CheckOut(string documentNumber, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new CheckOutVisitCommand(documentNumber, 1), cancellationToken);
+        var result = await _mediator.Send(new CheckOutVisitCommand(documentNumber, CurrentUserId), cancellationToken);
         return Ok(result);
     }
 
@@ -77,7 +77,7 @@ public sealed class VisitsController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        await _mediator.Send(new DeleteVisitCommand(id, 1), cancellationToken);
+        await _mediator.Send(new DeleteVisitCommand(id, CurrentUserId), cancellationToken);
         return NoContent();
     }
 }

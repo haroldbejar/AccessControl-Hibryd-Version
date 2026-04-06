@@ -45,7 +45,7 @@ public sealed class UsersController : BaseController
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new DeleteUserCommand(id, 1), cancellationToken);
+        var result = await _mediator.Send(new DeleteUserCommand(id, CurrentUserId), cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

@@ -1,9 +1,11 @@
 using AccessControl.Application.Features.Auth.Commands.Login;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.API.Controllers;
 
+[AllowAnonymous]
 [Route("api/auth")]
 public sealed class AuthController : BaseController
 {

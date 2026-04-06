@@ -1,6 +1,8 @@
+using AccessControl.Application.Common.Interfaces;
 using AccessControl.Domain.Interfaces;
 using AccessControl.Infrastructure.Persistence;
 using AccessControl.Infrastructure.Persistence.Repositories;
+using AccessControl.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +49,9 @@ public static class DependencyInjection
 
         // --- Unit of Work ---
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // --- Servicios de infraestructura ---
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         return services;
     }

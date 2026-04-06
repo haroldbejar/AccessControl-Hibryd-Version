@@ -81,7 +81,7 @@ public sealed class PackagesController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        await _mediator.Send(new DeletePackageCommand(id, 1), cancellationToken);
+        await _mediator.Send(new DeletePackageCommand(id, CurrentUserId), cancellationToken);
         return NoContent();
     }
 }
