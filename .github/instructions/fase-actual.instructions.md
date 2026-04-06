@@ -27,21 +27,33 @@ applyTo: '\*_/_'
 
 - [x] **1.1 Setup inicial** — Estructura Clean Architecture creada
 - [x] **1.2 Migración de entidades** — Todas las entidades definidas en `AccessControl.Domain/Entities/`
-- [ ] **1.3 Infrastructure Layer**
-- [ ] **1.4 Application Layer (CQRS)**
-- [ ] **1.5 API Controllers**
+- [x] **1.3 Infrastructure Layer** — EF Core 9 + Pomelo, AppDbContext, 10 configuraciones Fluent API, GenericRepository, 8 repositorios específicos, UnitOfWork, DependencyInjection. Build: 0 errores.
+- [x] **1.4 Application Layer (CQRS)** — MediatR + FluentValidation + Mapperly. 32 casos de uso (Visits, Packages, Users, Auth, Destinations, Representatives, Roles, Menus, Authorizations). Result<T>, ValidationBehavior, LoggingBehavior, 8 mappers con RequiredMappingStrategy.Target. Build: 0 errores, 0 warnings.
+- [x] **1.5 API Controllers** — ExceptionMiddleware, Program.cs (Serilog + Swagger/OpenAPI JWT + CORS + HealthChecks), BaseController, 9 controllers (32 endpoints totales). Build: 0 errores, 0 warnings. Campos de auditoría (UserEliminated/UserModified) hardcodeados como `1` — se reemplazarán con userId del JWT en 1.6.
 - [ ] **1.6 JWT Authentication**
 - [ ] **1.7 Testing**
 - [ ] **1.8 Documentación y Deploy**
 
 ---
 
-## Subfase actual: 1.3 — Infrastructure Layer
+## Subfase actual: 1.6 — JWT Authentication
 
-- Configurar Entity Framework Core 9 con MySQL
-- Implementar ApplicationDbContext con todas las configuraciones
-- Crear repositorio genérico base (Repository<T>)
-- Implementar repositorios específicos para cada entidad
-- Implementar Unit of Work
-- Generar y aplicar migraciones iniciales
-- Seed data inicial (datos de prueba)
+### Objetivo
+
+Proteger los endpoints con autenticación JWT Bearer. El `AuthController.Login` ya existe y devuelve `LoginResponse` — falta generar el token real y validarlo en cada request.
+
+### Tareas
+
+- `JwtTokenService` en Infrastructure — genera el JWT firmado con clave secreta, expira en X minutos
+- `LoginCommandHandler` — reemplaza la lógica de retorno por llamada a `JwtTokenService`
+- `LoginResponse` — incluir `Token` (string) y `Expiration` (DateTime)
+- `appsettings.json` — sección `Jwt` con `Key`, `Issuer`, `Audience`, `ExpiresInMinutes`
+- `Program.cs` — activar `UseAuthentication()` + configurar `AddJwtBearer` con parámetros de `appsettings`
+- Controllers — agregar `[Authorize]` a todos excepto `AuthController`
+- Reemplazar `1` hardcodeado en `UserEliminated`/`UserModified` por `userId` extraído del claim JWT
+
+### Notas técnicas
+
+- Paquete ya referenciado: `Microsoft.AspNetCore.Authentication.JwtBearer 9.0.14`
+- Claim a usar para userId: `ClaimTypes.NameIdentifier` o claim personalizado `uid`
+- `AuthController` debe quedar con `[AllowAnonymous]`
