@@ -1,0 +1,53 @@
+using AccessControl.Domain.Interfaces;
+using AccessControl.Infrastructure.Persistence;
+using AccessControl.Infrastructure.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace AccessControl.Infrastructure;
+
+public static class DependencyInjection
+{
+    /// <summary>
+    /// Registra todos los servicios de la capa Infrastructure:
+    /// DbContext, repositorios y UnitOfWork.
+    /// </summary>
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        // --- AppDbContext con Pomelo (MySQL) ---
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException(
+                "La cadena de conexión 'DefaultConnection' no está configurada.");
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseMySql(
+                connectionString,
+                ServerVersion.AutoDetect(connectionString),
+                mysql =>
+                {
+                    mysql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                    mysql.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorNumbersToAdd: null);
+                }));
+
+        // --- Repositorios específicos ---
+        services.AddScoped<IVisitRepository, VisitRepository>();
+        services.AddScoped<IPackageRepository, PackageRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRepresentativeRepository, RepresentativeRepository>();
+        services.AddScoped<IDestinationRepository, DestinationRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+        services.AddScoped<IMenuRepository, MenuRepository>();
+
+        // --- Unit of Work ---
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        return services;
+    }
+}
