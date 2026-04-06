@@ -25,6 +25,7 @@ Este proyecto es la modernización completa de un sistema WPF legado, migrado a 
 | Framework     | ASP.NET Core                           | 9.0             |
 | Lenguaje      | C#                                     | 13              |
 | ORM           | Entity Framework Core + Pomelo (MySQL) | 9.0.14 + 9.0.0  |
+| Mapeador      | Riok.Mapperly                          | 4.3.1           |
 | CQRS          | MediatR                                | 14.1.0          |
 | Validación    | FluentValidation + DI Extensions       | 12.1.1          |
 | Auth          | JWT Bearer + BCrypt.Net-Next           | 9.0.14 / 4.0.3  |
@@ -294,6 +295,43 @@ docker/
 └── mysql/
     └── init.sql             ← Script inicial de base de datos
 ```
+
+## Arquitectura
+
+┌────────────────────────────────────────────────────────────────────┐
+│ 🎯 ARQUITECTURA MODERNA │
+└────────────────────────────────────────────────────────────────────┘
+
+              ┌─────────────────────────────────────┐
+              │      FRONTEND (ÚNICO CÓDIGO)        │
+              │                                     │
+              │    🎨 React + TypeScript            │
+              │    🎨 TailwindCSS / ShadCN          │
+              │    🎨 Responsive & Modern           │
+              └──────────────┬──────────────────────┘
+                             │
+          ┌──────────────────┴──────────────────┐
+          │                                     │
+
+┌─────────▼────────┐ ┌────────▼─────────┐
+│ 📴 MODO OFFLINE │ │ 🌐 MODO ONLINE │
+│ (Electron) │ │ (Browser) │
+├──────────────────┤ ├──────────────────┤
+│ - Desktop App │ │ - Progressive │
+│ - React bundled │ │ Web App (PWA) │
+│ - API local │ │ - Cloud hosted │
+│ - MySQL local │ │ - API remota │
+└─────────┬────────┘ └────────┬─────────┘
+│ │
+│ ┌──────────────────┐ │
+└────────►│ API REST .NET 8 │◄──────┘
+│ (Backend único) │
+└─────────┬────────┘
+│
+┌─────────▼────────┐
+│ MySQL Database │
+│ (Local o Cloud) │
+└──────────────────┘
 
 ---
 
