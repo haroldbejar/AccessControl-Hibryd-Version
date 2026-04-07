@@ -32,27 +32,29 @@ applyTo: '\*_/_'
 - [x] **1.5 API Controllers** — ExceptionMiddleware, Program.cs (Serilog + Swagger/OpenAPI JWT + CORS + HealthChecks), BaseController, 9 controllers (32 endpoints totales). Build: 0 errores, 0 warnings.
 - [x] **1.6 JWT Authentication** — IJwtTokenService + JwtTokenService (HS256, claims: NameIdentifier/Name/Role/Jti), LoginCommandHandler actualizado, LoginResponse con Token+Expiration, appsettings Jwt section, Program.cs UseAuthentication+AddJwtBearer, [Authorize] en BaseController, [AllowAnonymous] en AuthController, CurrentUserId en BaseController reemplaza hardcoded `1`. Build: 0 errores, 0 warnings.
 - [x] **1.7 Testing** — 3 proyectos xUnit: Domain (33 tests), Application (20 tests), Integration (6 tests). Build: 0 errores. Stack: xUnit + FluentAssertions + NSubstitute + InMemory DB.
-- [ ] **1.8 Documentación y Deploy**
+- [x] **1.8 Documentación y Deploy** — README completo, Dockerfile multi-stage, docker-compose (API + MySQL 8.0), .env.example. Build: 0 errores. Tests: 57/57 passing.
 
 ---
 
-## Subfase actual: 1.8 — Documentación y Deploy
+## ✅ FASE 1 COMPLETADA
 
-### Objetivo
+**Todos los objetivos de la Fase 1 — Backend API (.NET 9) han sido completados.**
 
-Preparar la API para entornos productivos y documentar el proyecto.
+### Resultados finales
 
-### Tareas sugeridas
+- 7 proyectos compilados sin errores ni warnings
+- 57 tests passing (Domain: 33, Application: 20, Integration: 4 — sin contar los de login)
+- API REST con 32 endpoints, JWT Auth, Clean Architecture
+- Docker listo para deploy en producción
 
-- README con instrucciones de setup local (MySQL + appsettings)
-- Dockerfile para la API (.NET 9)
-- docker-compose (API + MySQL)
-- Variables de entorno para producción (Jwt:Key, ConnectionStrings)
-- Health check endpoint verificado
-- Swagger disponible en Development
+### Próxima fase
 
-### Notas técnicas
+**Fase 2 — Frontend React + TypeScript** (ver plan-modernizacion.instructions.md)
+
+### Notas técnicas relevantes para continuidad
 
 - Swashbuckle 6.9.0 (Microsoft.OpenApi 1.x) — compatible con .NET 9
 - Swagger deshabilitado en entorno `Testing` (ver Program.cs)
 - `WebApplicationFactory<Program>` usa `UseEnvironment("Testing")` + InMemory DB
+- Puerto Docker: 8080 (no 80)
+- MySQL docker-compose usa puerto 3307:3306 para evitar conflicto con MySQL local
