@@ -2,7 +2,9 @@ using System.Text;
 using AccessControl.API.Middleware;
 using AccessControl.Application;
 using AccessControl.Infrastructure;
+using AccessControl.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -111,6 +113,15 @@ try
     var app = builder.Build();
 
     Log.Information("Iniciando AccessControl API...");
+
+    // ─── Seed de datos iniciales ──────────────────────────────────────────────
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Database.MigrateAsync();
+        await DbSeeder.SeedAsync(dbContext);
+    }
 
     // ─── Middleware pipeline ──────────────────────────────────────────────────
     app.UseMiddleware<ExceptionMiddleware>();

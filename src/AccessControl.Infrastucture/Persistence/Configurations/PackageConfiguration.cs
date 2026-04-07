@@ -39,9 +39,10 @@ public sealed class PackageConfiguration : IEntityTypeConfiguration<Package>
         builder.Property(p => p.DeliverySignature).HasColumnType("longblob");
 
         // Estado (enum → int)
+        // Sin HasDefaultValue: EF usa el valor del CLR (0 = Received) directamente.
+        // Esto evita el warning de sentinel value con tipos enum no-nullable.
         builder.Property(p => p.Status)
-            .HasConversion<int>()
-            .HasDefaultValue(PackagesStatusEnum.Received);
+            .HasConversion<int>();
 
         builder.Property(p => p.Notes).HasMaxLength(500);
 

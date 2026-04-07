@@ -41,7 +41,6 @@ public static class DependencyInjection
                     new MySqlServerVersion(new Version(8, 0, 0)),
                     mysql =>
                     {
-                        mysql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
                         mysql.EnableRetryOnFailure(
                             maxRetryCount: 5,
                             maxRetryDelay: TimeSpan.FromSeconds(10),
