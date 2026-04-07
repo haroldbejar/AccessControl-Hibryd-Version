@@ -31,30 +31,28 @@ applyTo: '\*_/_'
 - [x] **1.4 Application Layer (CQRS)** — MediatR + FluentValidation + Mapperly. 32 casos de uso (Visits, Packages, Users, Auth, Destinations, Representatives, Roles, Menus, Authorizations). Result<T>, ValidationBehavior, LoggingBehavior, 8 mappers con RequiredMappingStrategy.Target. Build: 0 errores, 0 warnings.
 - [x] **1.5 API Controllers** — ExceptionMiddleware, Program.cs (Serilog + Swagger/OpenAPI JWT + CORS + HealthChecks), BaseController, 9 controllers (32 endpoints totales). Build: 0 errores, 0 warnings.
 - [x] **1.6 JWT Authentication** — IJwtTokenService + JwtTokenService (HS256, claims: NameIdentifier/Name/Role/Jti), LoginCommandHandler actualizado, LoginResponse con Token+Expiration, appsettings Jwt section, Program.cs UseAuthentication+AddJwtBearer, [Authorize] en BaseController, [AllowAnonymous] en AuthController, CurrentUserId en BaseController reemplaza hardcoded `1`. Build: 0 errores, 0 warnings.
-- [ ] **1.7 Testing**
+- [x] **1.7 Testing** — 3 proyectos xUnit: Domain (33 tests), Application (20 tests), Integration (6 tests). Build: 0 errores. Stack: xUnit + FluentAssertions + NSubstitute + InMemory DB.
 - [ ] **1.8 Documentación y Deploy**
 
 ---
 
-## Subfase actual: 1.7 — Testing
+## Subfase actual: 1.8 — Documentación y Deploy
 
 ### Objetivo
 
-Cubrir con pruebas automatizadas las capas Domain, Application e Integration (API).
+Preparar la API para entornos productivos y documentar el proyecto.
 
-### Proyectos de test disponibles
+### Tareas sugeridas
 
-- `tests/AccessControl.Domain.Tests/` — xUnit
-- `tests/AccessControl.Application.Tests/` — xUnit
-- `tests/AccessControl.API.IntegrationTests/` — xUnit
-
-### Prioridades sugeridas
-
-- Application: handlers críticos (LoginCommandHandler, CreateVisitCommandHandler, CreatePackageCommandHandler)
-- Domain: validaciones de entidades y excepciones
-- Integration: endpoint `/api/auth/login` (happy path + credenciales inválidas)
+- README con instrucciones de setup local (MySQL + appsettings)
+- Dockerfile para la API (.NET 9)
+- docker-compose (API + MySQL)
+- Variables de entorno para producción (Jwt:Key, ConnectionStrings)
+- Health check endpoint verificado
+- Swagger disponible en Development
 
 ### Notas técnicas
 
-- Stack: xUnit + FluentAssertions + NSubstitute (mocks)
-- Para integration tests: `WebApplicationFactory<Program>` + base de datos en memoria o SQLite
+- Swashbuckle 6.9.0 (Microsoft.OpenApi 1.x) — compatible con .NET 9
+- Swagger deshabilitado en entorno `Testing` (ver Program.cs)
+- `WebApplicationFactory<Program>` usa `UseEnvironment("Testing")` + InMemory DB

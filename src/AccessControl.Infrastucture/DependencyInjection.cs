@@ -17,25 +17,37 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        bool useInMemoryDatabase = false)
     {
-        // --- AppDbContext con Pomelo (MySQL) ---
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "La cadena de conexión 'DefaultConnection' no está configurada.");
+        // --- AppDbContext ---
+        if (useInMemoryDatabase)
+        {
+            // El nombre debe calcularse FUERA del lambda para que todos los scopes
+            // compartan la misma base de datos InMemory durante el test.
+            var inMemoryDbName = "TestDb_" + Guid.NewGuid();
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseInMemoryDatabase(inMemoryDbName));
+        }
+        else
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "La cadena de conexión 'DefaultConnection' no está configurada.");
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseMySql(
-                connectionString,
-                ServerVersion.AutoDetect(connectionString),
-                mysql =>
-                {
-                    mysql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
-                    mysql.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(10),
-                        errorNumbersToAdd: null);
-                }));
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseMySql(
+                    connectionString,
+                    new MySqlServerVersion(new Version(8, 0, 0)),
+                    mysql =>
+                    {
+                        mysql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                        mysql.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorNumbersToAdd: null);
+                    }));
+        }
 
         // --- Repositorios específicos ---
         services.AddScoped<IVisitRepository, VisitRepository>();

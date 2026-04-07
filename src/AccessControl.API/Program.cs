@@ -4,22 +4,16 @@ using AccessControl.Application;
 using AccessControl.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Serilog;
-
-// ─── Serilog ────────────────────────────────────────────────────────────────
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("logs/accesscontrol-.log", rollingInterval: RollingInterval.Day)
-    .CreateBootstrapLogger();
 
 try
 {
-    Log.Information("Iniciando AccessControl API...");
-
     var builder = WebApplication.CreateBuilder(args);
 
     // ─── Serilog host ────────────────────────────────────────────────────────
+    // Se usa configuración directa (sin CreateBootstrapLogger) para compatibilidad
+    // con WebApplicationFactory en integration tests (evita ReloadableLogger.Freeze()).
     builder.Host.UseSerilog((ctx, lc) => lc
         .ReadFrom.Configuration(ctx.Configuration)
         .WriteTo.Console()
@@ -27,7 +21,7 @@ try
 
     // ─── Application + Infrastructure ────────────────────────────────────────
     builder.Services.AddApplication();
-    builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.IsEnvironment("Testing"));
 
     // ─── Controllers ─────────────────────────────────────────────────────────
     builder.Services.AddControllers();
@@ -42,36 +36,48 @@ try
     });
 
     // ─── Swagger / OpenAPI ───────────────────────────────────────────────────
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(c =>
+    // Se omite en entorno Testing para evitar conflictos de versión entre
+    // Microsoft.OpenApi v2.x (AspNetCore.OpenApi 9) y Swashbuckle v10.
+    if (!builder.Environment.IsEnvironment("Testing"))
     {
-        c.SwaggerDoc("v1", new OpenApiInfo
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
         {
-            Title = "AccessControl API",
-            Version = "v1",
-            Description = "API REST para el sistema de control de acceso de conjuntos residenciales",
-            Contact = new OpenApiContact { Name = "AccessControl Team" }
-        });
-
-        // Soporte JWT en Swagger (preparado para Subfase 1.6)
-        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-        {
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            Scheme = "Bearer",
-            BearerFormat = "JWT",
-            In = ParameterLocation.Header,
-            Description = "Ingresa el token JWT. Ejemplo: Bearer {token}"
-        });
-
-        c.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
-        {
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
-                new OpenApiSecuritySchemeReference("Bearer"),
-                new List<string>()
-            }
+                Title = "AccessControl API",
+                Version = "v1",
+                Description = "API REST para el sistema de control de acceso de conjuntos residenciales",
+                Contact = new OpenApiContact { Name = "AccessControl Team" }
+            });
+
+            // Soporte JWT en Swagger
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Ingresa el token JWT. Ejemplo: Bearer {token}"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new List<string>()
+                }
+            });
         });
-    });
+    }
 
     // ─── JWT Authentication ────────────────────────────────────────────────────
     var jwtKey = builder.Configuration["Jwt:Key"]
@@ -104,6 +110,8 @@ try
 
     var app = builder.Build();
 
+    Log.Information("Iniciando AccessControl API...");
+
     // ─── Middleware pipeline ──────────────────────────────────────────────────
     app.UseMiddleware<ExceptionMiddleware>();
 
@@ -127,7 +135,7 @@ try
 
     app.Run();
 }
-catch (Exception ex)
+catch (Exception ex) when (ex is not HostAbortedException)
 {
     Log.Fatal(ex, "AccessControl API terminó de forma inesperada.");
 }
