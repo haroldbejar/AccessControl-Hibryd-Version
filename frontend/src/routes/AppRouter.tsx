@@ -1,13 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { MainLayout } from "@/layouts/MainLayout";
+import { LoginPage } from "@/features/auth/LoginPage";
 
 // Placeholders — serán reemplazados en subfases siguientes
-const LoginPage = () => (
-  <div className="flex h-screen items-center justify-center">
-    <p className="text-xl text-muted-foreground">Login Page — Subfase 2.3</p>
-  </div>
-);
 const DashboardPage = () => (
   <div className="text-xl font-semibold">Dashboard</div>
 );

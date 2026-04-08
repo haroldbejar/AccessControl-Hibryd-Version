@@ -50,7 +50,7 @@ export function MainLayout() {
 
         {/* Info del usuario */}
         <div className="px-4 py-4 border-t">
-          <p className="text-sm font-medium truncate">{user?.userName}</p>
+          <p className="text-sm font-medium truncate">{user?.name}</p>
           <p className="text-xs text-muted-foreground truncate">
             {user?.roleName}
           </p>
