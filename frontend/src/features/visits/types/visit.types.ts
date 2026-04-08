@@ -79,6 +79,8 @@ export interface CreateVisitRequest {
   model?: string;
   color?: string;
   plate?: string;
+  photo?: string;
+  photo2?: string;
   userCreated: number;
 }
 

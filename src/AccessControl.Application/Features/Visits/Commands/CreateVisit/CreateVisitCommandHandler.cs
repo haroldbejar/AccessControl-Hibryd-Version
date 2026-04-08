@@ -45,6 +45,7 @@ public sealed class CreateVisitCommandHandler : IRequestHandler<CreateVisitComma
             Color = request.Color,
             Plate = request.Plate,
             Photo = request.Photo,
+            Photo2 = request.Photo2,
             CheckIn = DateTime.UtcNow,
             UserCreated = request.UserCreated
         };

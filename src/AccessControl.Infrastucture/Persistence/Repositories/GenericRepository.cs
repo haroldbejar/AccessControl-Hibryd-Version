@@ -17,7 +17,7 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
     }
 
     // Usa FirstOrDefaultAsync para respetar el query filter de soft-delete (FindAsync lo omite)
-    public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public virtual async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         => await _dbSet.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
     public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)

@@ -27,6 +27,7 @@ import {
   useDestinations,
   useRepresentativesByDestination,
 } from "../hooks/useVisits";
+import { CameraCapture } from "@/shared/components/CameraCapture";
 
 const schema = z
   .object({
@@ -43,6 +44,8 @@ const schema = z
     model: z.string().optional(),
     color: z.string().optional(),
     plate: z.string().optional(),
+    photo: z.string().min(1, "La foto del visitante es requerida"),
+    photo2: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.hasVehicle && data.vehicleTypeId === VehicleTypeEnum.NA) {
@@ -86,6 +89,8 @@ export function CreateVisitDialog({ open, onClose }: Props) {
     defaultValues: {
       hasVehicle: false,
       vehicleTypeId: VehicleTypeEnum.NA,
+      photo: "",
+      photo2: "",
     },
   });
 
@@ -112,6 +117,8 @@ export function CreateVisitDialog({ open, onClose }: Props) {
       model: data.model || undefined,
       color: data.color || undefined,
       plate: data.plate || undefined,
+      photo: data.photo || undefined,
+      photo2: data.photo2 || undefined,
       userCreated: userId,
     });
   };
@@ -317,6 +324,27 @@ export function CreateVisitDialog({ open, onClose }: Props) {
               </div>
             </div>
           )}
+
+          {/* Fotografías */}
+          <div className="space-y-3 border-t border-border pt-3">
+            <p className="text-sm font-medium">Fotografías</p>
+            <CameraCapture
+              key={`photo1-${open}`}
+              label="Foto del visitante"
+              required
+              onCapture={(b64) =>
+                setValue("photo", b64 ?? "", { shouldValidate: true })
+              }
+            />
+            {errors.photo && (
+              <p className="text-xs text-destructive">{errors.photo.message}</p>
+            )}
+            <CameraCapture
+              key={`photo2-${open}`}
+              label="Foto adicional (opcional)"
+              onCapture={(b64) => setValue("photo2", b64 ?? "")}
+            />
+          </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>

@@ -19,5 +19,6 @@ public sealed record CreateVisitCommand(
     string? Color,
     string? Plate,
     byte[]? Photo,
+    byte[]? Photo2,
     int UserCreated
 ) : IRequest<Result<VisitResponse>>;

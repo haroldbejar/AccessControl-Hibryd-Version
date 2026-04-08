@@ -9,6 +9,17 @@ public sealed class VisitRepository : GenericRepository<Visit>, IVisitRepository
     public VisitRepository(AppDbContext context) : base(context) { }
 
     /// <summary>
+    /// Carga una visita por Id incluyendo Representative y su Destination (necesario para el mapper).
+    /// </summary>
+    public override async Task<Visit?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+        => await _dbSet
+            .Include(v => v.Representative)
+                .ThenInclude(r => r.Destination)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+    /// <summary>
     /// Devuelve la visita activa (sin checkout) que coincide con el número de documento.
     /// </summary>
     public async Task<Visit?> GetByDocumentNumberAsync(
@@ -16,6 +27,7 @@ public sealed class VisitRepository : GenericRepository<Visit>, IVisitRepository
         CancellationToken cancellationToken = default)
         => await _dbSet
             .Include(v => v.Representative)
+                .ThenInclude(r => r.Destination)
             .FirstOrDefaultAsync(
                 v => v.DocumentNumber == documentNumber && v.CheckOut == null,
                 cancellationToken);
@@ -28,6 +40,7 @@ public sealed class VisitRepository : GenericRepository<Visit>, IVisitRepository
         CancellationToken cancellationToken = default)
         => await _dbSet
             .Include(v => v.Representative)
+                .ThenInclude(r => r.Destination)
             .Where(v => v.DocumentNumber == documentNumber)
             .OrderByDescending(v => v.CheckIn)
             .FirstOrDefaultAsync(cancellationToken);
