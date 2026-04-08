@@ -16,45 +16,55 @@ applyTo: '\*_/_'
 
 > ⚠️ Este archivo define el contexto de trabajo actual. Leerlo antes de ejecutar cualquier tarea.
 
-## Fase actual: Fase 1 — Backend API (.NET 9)
+## Fase actual: Fase 2 — Frontend React + TypeScript
 
-**Objetivo:** API REST funcional que reemplace la capa Business del sistema WPF legado  
-**Duración estimada:** 4-6 semanas (160-240 horas)
+**Objetivo:** SPA React moderna que consuma la API REST y reemplace la UI WPF legada  
+**Stack:** Vite 8 + React 19 + TypeScript 6 + TailwindCSS v4 + ShadCN UI
 
 ---
 
 ## Estado de subfases
 
-- [x] **1.1 Setup inicial** — Estructura Clean Architecture creada
-- [x] **1.2 Migración de entidades** — Todas las entidades definidas en `AccessControl.Domain/Entities/`
-- [x] **1.3 Infrastructure Layer** — EF Core 9 + Pomelo, AppDbContext, 10 configuraciones Fluent API, GenericRepository, 8 repositorios específicos, UnitOfWork, DependencyInjection. Build: 0 errores.
-- [x] **1.4 Application Layer (CQRS)** — MediatR + FluentValidation + Mapperly. 32 casos de uso (Visits, Packages, Users, Auth, Destinations, Representatives, Roles, Menus, Authorizations). Result<T>, ValidationBehavior, LoggingBehavior, 8 mappers con RequiredMappingStrategy.Target. Build: 0 errores, 0 warnings.
-- [x] **1.5 API Controllers** — ExceptionMiddleware, Program.cs (Serilog + Swagger/OpenAPI JWT + CORS + HealthChecks), BaseController, 9 controllers (32 endpoints totales). Build: 0 errores, 0 warnings.
-- [x] **1.6 JWT Authentication** — IJwtTokenService + JwtTokenService (HS256, claims: NameIdentifier/Name/Role/Jti), LoginCommandHandler actualizado, LoginResponse con Token+Expiration, appsettings Jwt section, Program.cs UseAuthentication+AddJwtBearer, [Authorize] en BaseController, [AllowAnonymous] en AuthController, CurrentUserId en BaseController reemplaza hardcoded `1`. Build: 0 errores, 0 warnings.
-- [x] **1.7 Testing** — 3 proyectos xUnit: Domain (33 tests), Application (20 tests), Integration (6 tests). Build: 0 errores. Stack: xUnit + FluentAssertions + NSubstitute + InMemory DB.
-- [x] **1.8 Documentación y Deploy** — README completo, Dockerfile multi-stage, docker-compose (API + MySQL 8.0), .env.example. Build: 0 errores. Tests: 57/57 passing.
+### Fase 1 — Backend API (.NET 9) ✅ COMPLETADA
+
+- [x] **1.1** Setup Clean Architecture
+- [x] **1.2** Migración de entidades
+- [x] **1.3** Infrastructure Layer (EF Core 9 + Pomelo, 10 configuraciones, repos, UoW)
+- [x] **1.4** Application Layer CQRS (32 casos de uso, MediatR, FluentValidation, Mapperly)
+- [x] **1.5** API Controllers (9 controllers, 32 endpoints, middleware)
+- [x] **1.6** JWT Authentication (HS256, BCrypt, [Authorize])
+- [x] **1.7** Testing (57/57 tests — Domain: 33, Application: 20, Integration: 4)
+- [x] **1.8** Documentación y Deploy (README, Dockerfile, docker-compose)
+
+### Fase 2 — Frontend React + TypeScript
+
+- [x] **2.1 Setup inicial** — Vite 8 + React 19 + TS 6 + TailwindCSS v4 + ShadCN UI (Radix/Nova). Path alias `@/*`. Build: 0 errores.
+- [x] **2.2 Infraestructura base** — Axios (interceptores JWT/401), Zustand authStore (persist localStorage), TanStack Query (QueryClient), React Router (BrowserRouter), ProtectedRoute, MainLayout (sidebar + topbar), AppRouter. Build: 0 errores.
+- [x] **2.3 Autenticación** — authService (POST /api/auth/login), LoginPage (RHF + Zod, toggle password, spinner, toast), guard de ruta, prueba e2e exitosa admin/Admin123!. Build: 0 errores.
+- [ ] **2.4 Módulo Visitas** — listado paginado, crear visita, checkout
+- [ ] **2.5 Módulo Paquetes** — listado, registrar paquete, entregar
+- [ ] **2.6 Módulo Dashboard** — estadísticas, visitas recientes
+- [ ] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin)
+- [ ] **2.8 Módulo Destinatarios y Representantes**
+- [ ] **2.9 PWA + optimizaciones finales**
 
 ---
 
-## ✅ FASE 1 COMPLETADA
+## Notas técnicas relevantes
 
-**Todos los objetivos de la Fase 1 — Backend API (.NET 9) han sido completados.**
+### Backend
 
-### Resultados finales
+- API en `http://localhost:5192` (perfil `http` de launchSettings.json)
+- Seed: `admin` / `Admin123!`
+- `LoginResponse` devuelve: `userId, userAccount, name, roleId, roleName, token, expiration`
+- JWT Bearer, `[AllowAnonymous]` solo en `AuthController`
 
-- 7 proyectos compilados sin errores ni warnings
-- 57 tests passing (Domain: 33, Application: 20, Integration: 4 — sin contar los de login)
-- API REST con 32 endpoints, JWT Auth, Clean Architecture
-- Docker listo para deploy en producción
+### Frontend (`frontend/`)
 
-### Próxima fase
-
-**Fase 2 — Frontend React + TypeScript** (ver plan-modernizacion.instructions.md)
-
-### Notas técnicas relevantes para continuidad
-
-- Swashbuckle 6.9.0 (Microsoft.OpenApi 1.x) — compatible con .NET 9
-- Swagger deshabilitado en entorno `Testing` (ver Program.cs)
-- `WebApplicationFactory<Program>` usa `UseEnvironment("Testing")` + InMemory DB
-- Puerto Docker: 8080 (no 80)
-- MySQL docker-compose usa puerto 3307:3306 para evitar conflicto con MySQL local
+- Dev server: `npx vite` → `http://localhost:5173`
+- Build: `npm run build`
+- TailwindCSS v4 via `@tailwindcss/vite` (sin postcss.config)
+- `ignoreDeprecations: "6.0"` en tsconfig para `baseUrl` (TS6)
+- ShadCN: `components.json` estilo `radix-nova`, iconos `lucide`
+- Zustand key en localStorage: `access-control-auth`
+- `AuthUser`: `{ userId, name, userAccount, roleName }` (campo `name`, no `userName`)
