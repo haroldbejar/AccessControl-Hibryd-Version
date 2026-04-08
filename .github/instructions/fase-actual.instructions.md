@@ -41,7 +41,7 @@ applyTo: '\*_/_'
 - [x] **2.1 Setup inicial** — Vite 8 + React 19 + TS 6 + TailwindCSS v4 + ShadCN UI (Radix/Nova). Path alias `@/*`. Build: 0 errores.
 - [x] **2.2 Infraestructura base** — Axios (interceptores JWT/401), Zustand authStore (persist localStorage), TanStack Query (QueryClient), React Router (BrowserRouter), ProtectedRoute, MainLayout (sidebar + topbar), AppRouter. Build: 0 errores.
 - [x] **2.3 Autenticación** — authService (POST /api/auth/login), LoginPage (RHF + Zod, toggle password, spinner, toast), guard de ruta, prueba e2e exitosa admin/Admin123!. Build: 0 errores.
-- [ ] **2.4 Módulo Visitas** — listado paginado, crear visita, checkout
+- [x] **2.4 Módulo Visitas** — tipos TS (`VehicleTypeEnum` const-object, `VisitResponse`, `CreateVisitRequest`, `CheckOutRequest`), visitService + destinationService + representativeService, hooks TanStack Query (useVisits, useVisitByDocument, useCreateVisit, useCheckOut, useDestinations, useRepresentativesByDestination), VisitsPage (tabla paginada, filtros fecha/documento/nombre, contadores), CreateVisitDialog (RHF+Zod, destino→representante dinámico, vehículo condicional), CheckOutDialog (búsqueda por documento, preview, confirmación). ShadCN: dialog, badge, select, label, input. Build: 0 errores.
 - [ ] **2.5 Módulo Paquetes** — listado, registrar paquete, entregar
 - [ ] **2.6 Módulo Dashboard** — estadísticas, visitas recientes
 - [ ] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin)

@@ -2,12 +2,12 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { MainLayout } from "@/layouts/MainLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
+import { VisitsPage } from "@/features/visits/VisitsPage";
 
 // Placeholders — serán reemplazados en subfases siguientes
 const DashboardPage = () => (
   <div className="text-xl font-semibold">Dashboard</div>
 );
-const VisitsPage = () => <div className="text-xl font-semibold">Visitas</div>;
 const PackagesPage = () => (
   <div className="text-xl font-semibold">Paquetes</div>
 );
