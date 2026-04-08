@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/features/auth/store/authStore";
 import { useVisitByDocument, useCheckOut } from "../hooks/useVisits";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -24,7 +23,6 @@ interface Props {
 export function CheckOutDialog({ open, onClose }: Props) {
   const [document, setDocument] = useState("");
   const [searching, setSearching] = useState(false);
-  const userId = useAuthStore((s) => s.user?.userId ?? 0);
 
   const {
     data: visit,
@@ -49,10 +47,7 @@ export function CheckOutDialog({ open, onClose }: Props) {
 
   const handleConfirm = () => {
     if (visit) {
-      checkOut.mutate({
-        documentNumber: visit.documentNumber,
-        userModified: userId,
-      });
+      checkOut.mutate(visit.documentNumber);
     }
   };
 

@@ -7,29 +7,32 @@ import type {
   CreateVisitRequest,
 } from "../types/visit.types";
 
+// El backend envuelve todas las respuestas en Result<T>
+type ApiResult<T> = { isSuccess: boolean; value: T; error: string | null };
+
 export const visitService = {
   getAll: async (params: GetAllVisitsParams): Promise<VisitResponse[]> => {
-    const response = await api.get<VisitResponse[]>("/visits", { params });
-    return response.data;
+    const response = await api.get<ApiResult<VisitResponse[]>>("/visits", {
+      params,
+    });
+    return response.data.value ?? [];
   },
 
   getByDocument: async (documentNumber: string): Promise<VisitResponse> => {
-    const response = await api.get<VisitResponse>(
+    const response = await api.get<ApiResult<VisitResponse>>(
       `/visits/document/${documentNumber}`,
     );
-    return response.data;
+    return response.data.value;
   },
 
   create: async (data: CreateVisitRequest): Promise<VisitResponse> => {
-    const response = await api.post<VisitResponse>("/visits", data);
-    return response.data;
+    const response = await api.post<ApiResult<VisitResponse>>("/visits", data);
+    return response.data.value;
   },
 
-  checkOut: async (
-    documentNumber: string,
-    userModified: number,
-  ): Promise<void> => {
-    await api.post("/visits/checkout", { documentNumber, userModified });
+  // PATCH /visits/{documentNumber}/checkout — userModified lo extrae el backend del JWT
+  checkOut: async (documentNumber: string): Promise<void> => {
+    await api.patch(`/visits/${documentNumber}/checkout`);
   },
 };
 

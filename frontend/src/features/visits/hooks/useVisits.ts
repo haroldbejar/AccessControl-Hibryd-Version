@@ -50,13 +50,8 @@ export function useCreateVisit(onSuccess?: () => void) {
 export function useCheckOut(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      documentNumber,
-      userModified,
-    }: {
-      documentNumber: string;
-      userModified: number;
-    }) => visitService.checkOut(documentNumber, userModified),
+    mutationFn: (documentNumber: string) =>
+      visitService.checkOut(documentNumber),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: visitKeys.all });
       toast.success("Checkout registrado correctamente");
