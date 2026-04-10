@@ -10,11 +10,26 @@ import { CreateVisitDialog } from "./components/CreateVisitDialog";
 import { CheckOutDialog } from "./components/CheckOutDialog";
 import type { GetAllVisitsParams } from "./types/visit.types";
 
+function todayDate() {
+  return format(new Date(), "yyyy-MM-dd");
+}
 function todayStart() {
   return format(startOfDay(new Date()), "yyyy-MM-dd'T'HH:mm:ss");
 }
 function todayEnd() {
   return format(endOfDay(new Date()), "yyyy-MM-dd'T'HH:mm:ss");
+}
+function toStartISO(date: string) {
+  return format(
+    startOfDay(new Date(`${date}T00:00:00`)),
+    "yyyy-MM-dd'T'HH:mm:ss",
+  );
+}
+function toEndISO(date: string) {
+  return format(
+    endOfDay(new Date(`${date}T00:00:00`)),
+    "yyyy-MM-dd'T'HH:mm:ss",
+  );
 }
 
 export function VisitsPage() {
@@ -27,22 +42,27 @@ export function VisitsPage() {
 
   const [docInput, setDocInput] = useState("");
   const [nameInput, setNameInput] = useState("");
+  const [dateStart, setDateStart] = useState(todayDate());
+  const [dateEnd, setDateEnd] = useState(todayDate());
   const [createOpen, setCreateOpen] = useState(false);
   const [checkOutOpen, setCheckOutOpen] = useState(false);
 
   const { data: visits = [], isFetching, refetch } = useVisits(filters);
 
   const applyFilters = () => {
-    setFilters((prev) => ({
-      ...prev,
+    setFilters({
+      startDate: toStartISO(dateStart),
+      endDate: toEndISO(dateEnd),
       documentFilter: docInput.trim() || undefined,
       nameFilter: nameInput.trim() || undefined,
-    }));
+    });
   };
 
   const clearFilters = () => {
     setDocInput("");
     setNameInput("");
+    setDateStart(todayDate());
+    setDateEnd(todayDate());
     setFilters({ startDate: todayStart(), endDate: todayEnd() });
   };
 
@@ -84,20 +104,42 @@ export function VisitsPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex gap-3 flex-wrap items-center">
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-muted-foreground whitespace-nowrap">
+            Desde
+          </span>
+          <input
+            type="date"
+            value={dateStart}
+            onChange={(e) => setDateStart(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-muted-foreground whitespace-nowrap">
+            Hasta
+          </span>
+          <input
+            type="date"
+            value={dateEnd}
+            onChange={(e) => setDateEnd(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
         <Input
           placeholder="Filtrar por documento..."
           value={docInput}
           onChange={(e) => setDocInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-          className="w-52"
+          className="w-48"
         />
         <Input
           placeholder="Filtrar por nombre..."
           value={nameInput}
           onChange={(e) => setNameInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-          className="w-52"
+          className="w-48"
         />
         <Button variant="secondary" size="sm" onClick={applyFilters}>
           Buscar
