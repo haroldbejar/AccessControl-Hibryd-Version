@@ -279,6 +279,45 @@ docker compose logs -f api
 
 ---
 
+## Design System — Paleta de colores (Neo Gradient)
+
+La paleta oficial del frontend es **Neo Gradient**. Las variables CSS de ShadCN en `frontend/src/index.css` deben respetar estos valores (modo claro):
+
+| Variable ShadCN                | Valor     | Descripción                             |
+| ------------------------------ | --------- | --------------------------------------- |
+| `--background`                 | `#F4F7FC` | Fondo general de la app                 |
+| `--foreground`                 | `#1F2937` | Texto principal                         |
+| `--card`                       | `#FFFFFF` | Superficie de tarjetas                  |
+| `--card-foreground`            | `#1F2937` | Texto sobre tarjetas                    |
+| `--primary`                    | `#5B8DEF` | Color primario (botones, links activos) |
+| `--primary-foreground`         | `#FFFFFF` | Texto sobre primario                    |
+| `--secondary`                  | `#EEF2FB` | Superficies secundarias                 |
+| `--secondary-foreground`       | `#1F2937` | Texto sobre secundario                  |
+| `--muted`                      | `#EEF2FB` | Fondos apagados                         |
+| `--muted-foreground`           | `#6B7280` | Texto secundario / hints                |
+| `--accent`                     | `#A78BFA` | Acento violeta suave                    |
+| `--accent-foreground`          | `#FFFFFF` | Texto sobre acento                      |
+| `--destructive`                | `#EF4444` | Acciones destructivas                   |
+| `--border`                     | `#D9E4F5` | Bordes                                  |
+| `--input`                      | `#D9E4F5` | Borde de inputs                         |
+| `--ring`                       | `#5B8DEF` | Focus ring                              |
+| `--sidebar`                    | `#FFFFFF` | Fondo del sidebar                       |
+| `--sidebar-foreground`         | `#1F2937` | Texto en sidebar                        |
+| `--sidebar-primary`            | `#5B8DEF` | Ítem activo en sidebar                  |
+| `--sidebar-primary-foreground` | `#FFFFFF` | Texto ítem activo                       |
+| `--sidebar-accent`             | `#EEF2FB` | Hover en sidebar                        |
+| `--sidebar-accent-foreground`  | `#5B8DEF` | Texto hover sidebar                     |
+| `--sidebar-border`             | `#D9E4F5` | Borde del sidebar                       |
+| `--sidebar-ring`               | `#5B8DEF` | Focus ring en sidebar                   |
+
+**Notas:**
+
+- TailwindCSS v4 acepta valores hex directos en variables CSS — no convertir a oklch ni HSL
+- El modo oscuro (`.dark`) está pendiente de definición — no modificar hasta tener la paleta oscura
+- No usar colores arbitrarios fuera de estas variables; siempre referenciar via `text-primary`, `bg-accent`, etc.
+
+---
+
 ## Recursos y scripts
 
 ```

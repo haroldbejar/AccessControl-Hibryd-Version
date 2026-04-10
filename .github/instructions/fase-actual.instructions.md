@@ -49,6 +49,8 @@ applyTo: '\*_/_'
 - [x] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin). Tipos, service, hooks, UsersPage, CreateUserDialog, EditUserDialog. Sidebar condicional (solo admin). Fix backend: `GenericRepository.GetAllAsync` → `virtual`; `UserRepository` override con `.Include(u => u.Role)`. Build: 0 errores.
 - [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
 - [ ] **2.9 PWA + optimizaciones finales**
+- [ ] **2.10.A Paleta Neo Gradient** — Cambio de paleta de colores en `index.css` (variables CSS ShadCN). Solo frontend, sin cambios de lógica.
+- [ ] **2.10.B Panel de Configuración de BD** — Endpoint admin-only `GET /PUT /api/settings` + `SettingsPage.tsx` para configurar la connection string desde la UI sin tocar archivos del servidor.
 
 ### Nota sobre autorización en la arquitectura moderna
 
@@ -181,3 +183,89 @@ Cada vez que un mapper accede a una navigation property (`entity.NavProp.Field`)
 - Un representante pertenece a un destinatario (`destinationId`)
 - Al crear/editar representante: select de destinatarios activos
 - `userCreated` / `userModified` → `userId` del `authStore`
+
+### Notas para subfase 2.10.A — Paleta Neo Gradient
+
+**Archivo a editar:** `frontend/src/index.css` — solo las variables CSS del bloque `:root` (modo claro).
+
+**Paleta completa — variables ShadCN → valores Neo Gradient:**
+
+| Variable                       | Valor     |
+| ------------------------------ | --------- |
+| `--background`                 | `#F4F7FC` |
+| `--foreground`                 | `#1F2937` |
+| `--card`                       | `#FFFFFF` |
+| `--card-foreground`            | `#1F2937` |
+| `--primary`                    | `#5B8DEF` |
+| `--primary-foreground`         | `#FFFFFF` |
+| `--secondary`                  | `#EEF2FB` |
+| `--secondary-foreground`       | `#1F2937` |
+| `--muted`                      | `#EEF2FB` |
+| `--muted-foreground`           | `#6B7280` |
+| `--accent`                     | `#A78BFA` |
+| `--accent-foreground`          | `#FFFFFF` |
+| `--destructive`                | `#EF4444` |
+| `--border`                     | `#D9E4F5` |
+| `--input`                      | `#D9E4F5` |
+| `--ring`                       | `#5B8DEF` |
+| `--sidebar`                    | `#FFFFFF` |
+| `--sidebar-foreground`         | `#1F2937` |
+| `--sidebar-primary`            | `#5B8DEF` |
+| `--sidebar-primary-foreground` | `#FFFFFF` |
+| `--sidebar-accent`             | `#EEF2FB` |
+| `--sidebar-accent-foreground`  | `#5B8DEF` |
+| `--sidebar-border`             | `#D9E4F5` |
+| `--sidebar-ring`               | `#5B8DEF` |
+
+**Notas técnicas:**
+
+- TailwindCSS v4 acepta hex directo en variables CSS — sin necesidad de convertir a oklch ni HSL
+- El modo oscuro (`.dark`) no se modifica en esta subfase — queda pendiente
+- Verificar build `npm run build` tras el cambio
+
+### Notas para subfase 2.10.B — Panel de Configuración Dinámica de BD
+
+**Arquitectura:**
+
+- Connection string extraída a `src/AccessControl.API/dbsettings.json` (archivo separado de `appsettings.json`)
+- `Program.cs` carga el archivo: `AddJsonFile("dbsettings.json", optional: true, reloadOnChange: false)` antes de `AddInfrastructure`
+- `SettingsController` (hereda `BaseController` → JWT obligatorio): `GET /api/settings` + `PUT /api/settings`
+- `dbsettings.json` agregado a `.gitignore` (contiene credenciales)
+
+**Endpoints backend:**
+
+- `GET /api/settings` → `DbSettingsDto { server, port, database, user, password: "***" }` (password enmascarado)
+- `PUT /api/settings` → body: `DbSettingsDto` completo → sobreescribe `dbsettings.json` → `200 OK`
+
+**DTO:**
+
+```csharp
+public record DbSettingsDto(string Server, int Port, string Database, string User, string Password);
+```
+
+**Archivos backend a crear/editar:**
+
+- CREAR: `src/AccessControl.API/dbsettings.json`
+- CREAR: `src/AccessControl.API/Controllers/SettingsController.cs`
+- EDITAR: `src/AccessControl.API/Program.cs` — AddJsonFile antes de AddInfrastructure
+- EDITAR: `.gitignore` — agregar `**/dbsettings.json`
+
+**Archivos frontend a crear/editar:**
+
+- `features/settings/types/settings.types.ts` — interfaz `DbSettings`
+- `features/settings/api/settingsService.ts` — GET + PUT
+- `features/settings/hooks/useSettings.ts` — TanStack Query
+- `features/settings/SettingsPage.tsx` — formulario RHF+Zod, toast éxito + aviso "Reinicia la API para aplicar los cambios"
+- EDITAR: `routes/AppRouter.tsx` — nueva ruta `/settings`
+- EDITAR: `layouts/MainLayout.tsx` — icono `Settings` en sidebar (solo admin)
+
+**Reglas de negocio:**
+
+- Solo admin puede ver y editar configuración (validado en sidebar + JWT en backend)
+- Password nunca se devuelve en texto plano desde el GET — siempre `"***"`
+- Los cambios requieren reinicio manual de la API (EF Core no admite hot-reload de `DbContextOptions`)
+- El aviso de reinicio es obligatorio en la UI tras un PUT exitoso
+
+**Patrón de respuesta:**
+
+- `SettingsController` → `Ok(result.Value)` (dato crudo) → frontend accede `response.data` directamente
