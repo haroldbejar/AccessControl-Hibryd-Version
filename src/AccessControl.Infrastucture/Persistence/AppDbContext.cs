@@ -13,10 +13,8 @@ public class AppDbContext : DbContext
     public DbSet<Package> Packages => Set<Package>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
-    public DbSet<Authorization> Authorizations => Set<Authorization>();
     public DbSet<Destination> Destinations => Set<Destination>();
     public DbSet<Representative> Representatives => Set<Representative>();
-    public DbSet<Menu> Menus => Set<Menu>();
     public DbSet<Mail> Mails => Set<Mail>();
     public DbSet<Stencil> Stencils => Set<Stencil>();
 

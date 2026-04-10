@@ -19,6 +19,5 @@ namespace AccessControl.Domain.Entities
 
         // Relaciones
         public virtual ICollection<User> Users { get; set; } = new List<User>();
-        public virtual ICollection<Authorization> Authorizations { get; set; } = new List<Authorization>();
     }
 }

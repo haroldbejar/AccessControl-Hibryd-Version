@@ -35,6 +35,7 @@ applyTo: '\*_/_'
 - [x] **1.6** JWT Authentication (HS256, BCrypt, [Authorize])
 - [x] **1.7** Testing (57/57 tests — Domain: 33, Application: 20, Integration: 4)
 - [x] **1.8** Documentación y Deploy (README, Dockerfile, docker-compose)
+- [x] **1.9 Limpieza arquitectural** — Eliminadas entidades `Authorization` y `Menu` (RBAC legacy WPF). 21 archivos eliminados (entidades, interfaces, repos, configs EF, mappers Mapperly, features CQRS, controllers). 5 archivos editados (Role, IUnitOfWork, UnitOfWork, DependencyInjection, AppDbContext). Migración `RemoveAuthorizationsAndMenus` aplicada a BD. Tests: 57/57 pasando (Domain: 32, Application: 19, Integration: 6). Build: 0 errores.
 
 ### Fase 2 — Frontend React + TypeScript
 
@@ -48,6 +49,12 @@ applyTo: '\*_/_'
 - [x] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin). Tipos, service, hooks, UsersPage, CreateUserDialog, EditUserDialog. Sidebar condicional (solo admin). Fix backend: `GenericRepository.GetAllAsync` → `virtual`; `UserRepository` override con `.Include(u => u.Role)`. Build: 0 errores.
 - [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
 - [ ] **2.9 PWA + optimizaciones finales**
+
+### Nota sobre autorización en la arquitectura moderna
+
+- El sistema de permisos granulares CRUD por menú (tabla `Authorizations` + `Menus`) era exclusivo del WPF legado
+- En la arquitectura moderna se usa: JWT Bearer (`[Authorize]` global) + `roleName` en frontend para visibilidad condicional de módulos
+- No hay permisos por operación (crear/editar/eliminar) por rol — diseño intencional
 
 ---
 

@@ -16,8 +16,6 @@ public sealed class UnitOfWork : IUnitOfWork
     private IRepresentativeRepository? _representatives;
     private IDestinationRepository? _destinations;
     private IRoleRepository? _roles;
-    private IAuthorizationRepository? _authorizations;
-    private IMenuRepository? _menus;
 
     public UnitOfWork(AppDbContext context)
     {
@@ -41,12 +39,6 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public IRoleRepository Roles
         => _roles ??= new RoleRepository(_context);
-
-    public IAuthorizationRepository Authorizations
-        => _authorizations ??= new AuthorizationRepository(_context);
-
-    public IMenuRepository Menus
-        => _menus ??= new MenuRepository(_context);
 
     // --- Persistencia ---
 

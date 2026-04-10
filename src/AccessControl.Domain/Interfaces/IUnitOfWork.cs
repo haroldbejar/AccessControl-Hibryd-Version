@@ -16,8 +16,6 @@ namespace AccessControl.Domain.Interfaces
         IRepresentativeRepository Representatives { get; }
         IDestinationRepository Destinations { get; }
         IRoleRepository Roles { get; }
-        IAuthorizationRepository Authorizations { get; }
-        IMenuRepository Menus { get; }
 
         // Transacciones
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

@@ -55,8 +55,6 @@ public static class DependencyInjection
         services.AddScoped<IRepresentativeRepository, RepresentativeRepository>();
         services.AddScoped<IDestinationRepository, DestinationRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
-        services.AddScoped<IMenuRepository, MenuRepository>();
 
         // --- Unit of Work ---
         services.AddScoped<IUnitOfWork, UnitOfWork>();
