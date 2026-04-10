@@ -6,6 +6,8 @@ import {
   LogOut,
   Shield,
   UserCog,
+  Building2,
+  ContactRound,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -22,9 +24,13 @@ export function MainLayout() {
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
 
-  const navItems = isAdmin
-    ? [...baseNavItems, { to: "/users", icon: UserCog, label: "Usuarios" }]
-    : baseNavItems;
+  const adminNavItems = [
+    { to: "/destinations", icon: Building2, label: "Destinatarios" },
+    { to: "/representatives", icon: ContactRound, label: "Representantes" },
+    { to: "/users", icon: UserCog, label: "Usuarios" },
+  ];
+
+  const navItems = isAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
 
   const handleLogout = () => {
     logout();

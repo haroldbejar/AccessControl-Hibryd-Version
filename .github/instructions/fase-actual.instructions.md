@@ -46,7 +46,7 @@ applyTo: '\*_/_'
 - [x] **2.5 Módulo Paquetes** — listado, registrar paquete (con foto + firma al recibir), entregar (con firma del receptor)
 - [x] **2.6 Módulo Dashboard** — 4 KPIs (visitas hoy, activas, paquetes hoy, pendientes), tabla visitas recientes del día, tabla paquetes pendientes. Card de ShadCN instalado. Build: 0 errores.
 - [x] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin). Tipos, service, hooks, UsersPage, CreateUserDialog, EditUserDialog. Sidebar condicional (solo admin). Fix backend: `GenericRepository.GetAllAsync` → `virtual`; `UserRepository` override con `.Include(u => u.Role)`. Build: 0 errores.
-- [ ] **2.8 Módulo Destinatarios y Representantes**
+- [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
 - [ ] **2.9 PWA + optimizaciones finales**
 
 ---

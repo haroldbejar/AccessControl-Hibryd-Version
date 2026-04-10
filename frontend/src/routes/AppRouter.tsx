@@ -6,6 +6,8 @@ import { VisitsPage } from "@/features/visits/VisitsPage";
 import { PackagesPage } from "@/features/packages/PackagesPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { UsersPage } from "@/features/users/UsersPage";
+import { DestinationsPage } from "@/features/destinations/DestinationsPage";
+import { RepresentativesPage } from "@/features/representatives/RepresentativesPage";
 
 export function AppRouter() {
   return (
@@ -21,6 +23,8 @@ export function AppRouter() {
           <Route path="/visits" element={<VisitsPage />} />
           <Route path="/packages" element={<PackagesPage />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/destinations" element={<DestinationsPage />} />
+          <Route path="/representatives" element={<RepresentativesPage />} />
         </Route>
       </Route>
 
