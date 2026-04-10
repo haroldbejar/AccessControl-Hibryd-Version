@@ -8,6 +8,7 @@ import {
   UserCog,
   Building2,
   ContactRound,
+  FileBarChart2,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ const baseNavItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/visits", icon: Users, label: "Visitas" },
   { to: "/packages", icon: Package, label: "Paquetes" },
+  { to: "/reports", icon: FileBarChart2, label: "Reportes" },
 ];
 
 export function MainLayout() {

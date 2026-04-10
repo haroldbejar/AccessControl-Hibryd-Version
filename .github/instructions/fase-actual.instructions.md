@@ -50,7 +50,7 @@ applyTo: '\*_/_'
 - [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
 - [x] **2.9 PWA + optimizaciones finales** — `vite-plugin-pwa` (manifest, Workbox NetworkFirst/CacheFirst, SW autoUpdate), favicon SVG candado (#5B8DEF), lazy loading de rutas (React.lazy + Suspense + PageLoader), NotFoundPage (404 con ShieldAlert), ErrorBoundary global (ShieldX), `index.html` lang=es + theme-color + meta description + título "Access Control". Build: 0 errores. `dist/sw.js` + `dist/workbox-*.js` generados.
 - [x] **2.10.A Paleta Neo Gradient** — Cambio de paleta de colores en `index.css` (variables CSS ShadCN). Solo frontend, sin cambios de lógica.
-- [ ] **2.11 Módulo de Reportes** — 5 informes descargables en PDF. R1–R4 visibles para todos los roles; R5 solo admin. Requiere 1 endpoint nuevo en backend (`GET /api/reports/summary`). Librería: `@react-pdf/renderer`. Ver notas técnicas al final de este archivo.
+- [x] **2.11 Módulo de Reportes** — 5 informes descargables en PDF (R1–R5). Backend: `GetActivitySummaryQuery` + `ReportsController` (`GET /api/reports/summary`). Frontend: `@react-pdf/renderer`, `ReportsPage` con Tabs ShadCN, `ReportFilters`, 5 componentes PDF (`VisitsPdf`, `VehicleVisitsPdf`, `PendingPackagesPdf`, `PackagesHistoryPdf`, `ActivitySummaryPdf`). R1–R4 visibles para todos los roles; R5 solo admin. Sidebar ítem `FileBarChart2` visible para todos. Build: 0 errores.
 
 ### Nota sobre autorización en la arquitectura moderna
 

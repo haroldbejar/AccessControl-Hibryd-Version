@@ -35,10 +35,15 @@ const RepresentativesPage = lazy(() =>
     default: m.RepresentativesPage,
   })),
 );
+const ReportsPage = lazy(() =>
+  import("@/features/reports/ReportsPage").then((m) => ({
+    default: m.ReportsPage,
+  })),
+);
 
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center h-full min-h-[300px]">
+    <div className="flex items-center justify-center h-full min-h-75">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
     </div>
   );
@@ -61,6 +66,7 @@ export function AppRouter() {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/destinations" element={<DestinationsPage />} />
             <Route path="/representatives" element={<RepresentativesPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
           </Route>
         </Route>
 
