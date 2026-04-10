@@ -50,6 +50,7 @@ applyTo: '\*_/_'
 - [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
 - [x] **2.9 PWA + optimizaciones finales** — `vite-plugin-pwa` (manifest, Workbox NetworkFirst/CacheFirst, SW autoUpdate), favicon SVG candado (#5B8DEF), lazy loading de rutas (React.lazy + Suspense + PageLoader), NotFoundPage (404 con ShieldAlert), ErrorBoundary global (ShieldX), `index.html` lang=es + theme-color + meta description + título "Access Control". Build: 0 errores. `dist/sw.js` + `dist/workbox-*.js` generados.
 - [x] **2.10.A Paleta Neo Gradient** — Cambio de paleta de colores en `index.css` (variables CSS ShadCN). Solo frontend, sin cambios de lógica.
+- [ ] **2.11 Módulo de Reportes** — 5 informes descargables en PDF. R1–R4 visibles para todos los roles; R5 solo admin. Requiere 1 endpoint nuevo en backend (`GET /api/reports/summary`). Librería: `@react-pdf/renderer`. Ver notas técnicas al final de este archivo.
 
 ### Nota sobre autorización en la arquitectura moderna
 
@@ -221,3 +222,114 @@ Cada vez que un mapper accede a una navigation property (`entity.NavProp.Field`)
 - TailwindCSS v4 acepta hex directo en variables CSS — sin necesidad de convertir a oklch ni HSL
 - El modo oscuro (`.dark`) no se modifica en esta subfase — queda pendiente
 - Verificar build `npm run build` tras el cambio
+
+### Notas para subfase 2.11 — Módulo de Reportes
+
+**Informe R1 — Visitas por período**
+
+- Reutiliza: `GET /api/visits?startDate&endDate`
+- Columnas PDF: N°, Fecha, Documento, Nombre, Destino, Representante, Entrada, Salida
+- Visible: todos los roles
+
+**Informe R2 — Visitas con vehículo**
+
+- Reutiliza: `GET /api/visits?startDate&endDate` filtrado `hasVehicle === true`
+- Columnas PDF: N°, Fecha, Nombre, Tipo vehículo, Marca, Modelo, Color, Placa
+- Visible: todos los roles
+
+**Informe R3 — Paquetes pendientes**
+
+- Reutiliza: `GET /api/packages/pending`
+- Columnas PDF: N°, Control, Remitente, Empresa, Tracking, Destinatario, Representante, F. Recepción
+- Visible: todos los roles
+
+**Informe R4 — Historial de paquetes**
+
+- Reutiliza: `GET /api/packages?startDate&endDate`
+- Columnas PDF: N°, Control, Remitente, Estado, Destinatario, F. Recepción, F. Entrega, Recibido por
+- Visible: todos los roles
+
+**Informe R5 — Resumen ejecutivo** _(solo admin)_
+
+- Requiere: `GET /api/reports/summary?startDate&endDate` ← **endpoint nuevo**
+- DTO respuesta: `ActivitySummaryResponse { TotalVisits, ActiveVisits, VisitsWithVehicle, TotalPackages, PendingPackages, DeliveredPackages, PeriodStart, PeriodEnd }`
+- Contenido PDF: tarjetas de KPIs + tabla de distribución
+- Visible: solo `roleName.toLowerCase().includes("admin")`
+
+**Endpoint nuevo a crear — backend:**
+
+- Ruta: `GET /api/reports/summary?startDate={date}&endDate={date}`
+- Controlador: `ReportsController`
+- Query: `GetActivitySummaryQuery` + handler
+- DTO: `ActivitySummaryResponse`
+- Patrón de respuesta: `Ok(result.Value)` (dato crudo, igual que Users/Roles)
+
+**Estructura de archivos a crear — backend:**
+
+```
+src/AccessControl.Application/Features/Reports/
+  Queries/GetActivitySummary/
+    GetActivitySummaryQuery.cs
+    GetActivitySummaryQueryHandler.cs
+    ActivitySummaryResponse.cs
+src/AccessControl.API/Controllers/
+  ReportsController.cs
+```
+
+**Estructura de archivos a crear — frontend:**
+
+```
+frontend/src/features/reports/
+  types/report.types.ts
+  api/reportService.ts
+  hooks/useReports.ts
+  pdf/
+    ReportLayout.tsx       ← template compartido (header, footer, estilos)
+    VisitsPdf.tsx          ← R1
+    VehicleVisitsPdf.tsx   ← R2
+    PendingPackagesPdf.tsx ← R3
+    PackagesHistoryPdf.tsx ← R4
+    ActivitySummaryPdf.tsx ← R5 (solo admin)
+  components/
+    ReportFilters.tsx      ← filtros de fecha + selector de informe
+  ReportsPage.tsx
+```
+
+**Reglas de implementación:**
+
+- `@react-pdf/renderer` instalar con `--legacy-peer-deps` (por Vite 8)
+- Fotos de visitantes → **excluidas del PDF** — solo datos textuales
+- PDF se genera y descarga en el cliente (sin endpoint de descarga en backend)
+- Fecha formateada: `dd/MM/yyyy HH:mm` (Colombia, fecha local)
+- Ruta: `/reports` — lazy loading en AppRouter
+- Sidebar: ícono `FileBarChart2` de lucide, visible para **todos los roles**
+- R5 tab: oculto condicionalmente con `roleName.toLowerCase().includes("admin")`
+- Filtros de fecha usando `<input type="date">` nativo (sin date-picker adicional)
+
+**Patrón de descarga PDF:**
+
+```tsx
+import { pdf } from "@react-pdf/renderer";
+const blob = await pdf(<ComponentePdf data={data} />).toBlob();
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.href = url;
+a.download = "reporte.pdf";
+a.click();
+URL.revokeObjectURL(url);
+```
+
+**Bugs conocidos / consideraciones @react-pdf/renderer:**
+
+- No soporta clases Tailwind — usar objetos `StyleSheet.create({})` con propiedades camelCase
+- Componentes disponibles: `Document`, `Page`, `View`, `Text`, `StyleSheet`
+- No usar componentes HTML (`div`, `span`, `table`) dentro de documentos PDF
+- `Font.register()` necesario si se quieren fuentes personalizadas (opcional — usar fuentes por defecto)
+- El hook `usePDF()` es alternativa a `pdf().toBlob()` para previsualización inline
+
+**Decisiones confirmadas:**
+
+- R1, R2, R3, R4 → visibles para **todos los roles** (portero + admin)
+- R5 Resumen Ejecutivo → solo **admin**
+- PDF generado en cliente con `@react-pdf/renderer`
+- Sidebar ítem `/reports` visible para todos los roles
