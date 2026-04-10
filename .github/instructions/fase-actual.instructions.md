@@ -49,7 +49,7 @@ applyTo: '\*_/_'
 - [x] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin). Tipos, service, hooks, UsersPage, CreateUserDialog, EditUserDialog. Sidebar condicional (solo admin). Fix backend: `GenericRepository.GetAllAsync` → `virtual`; `UserRepository` override con `.Include(u => u.Role)`. Build: 0 errores.
 - [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
 - [ ] **2.9 PWA + optimizaciones finales**
-- [ ] **2.10.A Paleta Neo Gradient** — Cambio de paleta de colores en `index.css` (variables CSS ShadCN). Solo frontend, sin cambios de lógica.
+- [x] **2.10.A Paleta Neo Gradient** — Cambio de paleta de colores en `index.css` (variables CSS ShadCN). Solo frontend, sin cambios de lógica.
 - [ ] **2.10.B Panel de Configuración de BD** — Endpoint admin-only `GET /PUT /api/settings` + `SettingsPage.tsx` para configurar la connection string desde la UI sin tocar archivos del servidor.
 
 ### Nota sobre autorización en la arquitectura moderna
