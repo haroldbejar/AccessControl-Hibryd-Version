@@ -44,7 +44,7 @@ applyTo: '\*_/_'
 - [x] **2.4 Módulo Visitas** — tipos TS (`VehicleTypeEnum` const-object, `VisitResponse`, `CreateVisitRequest`, `CheckOutRequest`), visitService + destinationService + representativeService, hooks TanStack Query (useVisits, useVisitByDocument, useCreateVisit, useCheckOut, useDestinations, useRepresentativesByDestination), VisitsPage (tabla paginada, filtros fecha/documento/nombre, contadores), CreateVisitDialog (RHF+Zod, destino→representante dinámico, vehículo condicional), CheckOutDialog (búsqueda por documento, preview, confirmación). ShadCN: dialog, badge, select, label, input. Build: 0 errores.
 - [x] **2.4.1 Captura de imágenes en visitas** ✅ COMPLETADA — CameraCapture.tsx (shared, reutilizable), Photo2 en backend (Command+Handler), CreateVisitDialog integrado con 2 fotos (foto1 obligatoria, foto2 opcional). Fix VisitRepository: override GetByIdAsync + ThenInclude(Destination) en todos los métodos. GenericRepository: GetByIdAsync virtual. Build: 0 errores.
 - [x] **2.5 Módulo Paquetes** — listado, registrar paquete (con foto + firma al recibir), entregar (con firma del receptor)
-- [ ] **2.6 Módulo Dashboard** — estadísticas, visitas recientes
+- [x] **2.6 Módulo Dashboard** — 4 KPIs (visitas hoy, activas, paquetes hoy, pendientes), tabla visitas recientes del día, tabla paquetes pendientes. Card de ShadCN instalado. Build: 0 errores.
 - [ ] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin)
 - [ ] **2.8 Módulo Destinatarios y Representantes**
 - [ ] **2.9 PWA + optimizaciones finales**
@@ -83,24 +83,11 @@ applyTo: '\*_/_'
 - Razón: Colombia es UTC-5; con UtcNow los registros caían en el día siguiente en la BD y el filtro de fecha del frontend (hora local) nunca los encontraba
 - Fix aplicado en: `CreateVisitCommandHandler`, `CheckOutVisitCommandHandler`, `CreatePackageCommandHandler`, `PackageRepository.DeliverPackageAsync`
 
-### Notas para subfase 2.6 — Dashboard
+### Notas para subfase 2.6 — Dashboard ✅
 
-**Firmas digitales — backend ya implementado:**
+- `DashboardPage.tsx` en `features/dashboard/`
+- Reutiliza `useVisits`, `usePackages`, `usePendingPackages` — sin endpoints nuevos
+- Fechas calculadas con `date-fns`: `startOfDay/endOfDay` → filtro hoy
+- Clases Tailwind: usar utilitarios (`max-w-35`, `max-w-30`) en lugar de valores arbitrarios
 
-- Entidad `Package` tiene dos campos: `ReceiverSignature: byte[]?` (al registrar) y `DeliverySignature: byte[]?` (al entregar)
-- `DeliverPackageCommand` ya acepta `byte[]? DeliverySignature`
-- `PackageResponse` devuelve ambas firmas
-
-**Componente `SignatureCapture` (nuevo — shared):**
-
-- Canvas táctil/mouse para dibujar firma a mano
-- Exporta como base64 puro (igual que `CameraCapture`)
-- Botones: Limpiar / Confirmar firma
-- Opcional: mostrar firma capturada como preview
-
-**Flujo paquetes:**
-
-- `POST /api/packages` — registrar: foto del paquete (`Photo`) + firma al recibir (`ReceiverSignature`, opcional)
-- `PATCH /api/packages/{id}/deliver` — entregar: firma del receptor (`DeliverySignature`, opcional)
-- `GET /api/packages` — listar con filtros: startDate, endDate, controlNumber, senderName, destinationId, status
-- `GET /api/packages/pending` — solo pendientes de entrega
+### Notas para subfase 2.7 — Usuarios
