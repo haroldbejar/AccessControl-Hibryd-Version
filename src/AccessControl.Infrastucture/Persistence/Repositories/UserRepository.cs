@@ -8,6 +8,12 @@ public sealed class UserRepository : GenericRepository<User>, IUserRepository
 {
     public UserRepository(AppDbContext context) : base(context) { }
 
+    public override async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await _dbSet
+            .Include(u => u.Role)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
     public async Task<User?> GetByUserAccountAsync(
         string userAccount,
         CancellationToken cancellationToken = default)

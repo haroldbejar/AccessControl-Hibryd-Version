@@ -5,6 +5,7 @@ import { LoginPage } from "@/features/auth/LoginPage";
 import { VisitsPage } from "@/features/visits/VisitsPage";
 import { PackagesPage } from "@/features/packages/PackagesPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { UsersPage } from "@/features/users/UsersPage";
 
 export function AppRouter() {
   return (
@@ -19,6 +20,7 @@ export function AppRouter() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/visits" element={<VisitsPage />} />
           <Route path="/packages" element={<PackagesPage />} />
+          <Route path="/users" element={<UsersPage />} />
         </Route>
       </Route>
 

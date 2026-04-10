@@ -20,7 +20,7 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
     public virtual async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         => await _dbSet.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
         => await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
 
     public async Task<IEnumerable<T>> FindAsync(

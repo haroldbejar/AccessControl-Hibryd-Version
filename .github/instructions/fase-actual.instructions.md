@@ -45,7 +45,7 @@ applyTo: '\*_/_'
 - [x] **2.4.1 Captura de imágenes en visitas** ✅ COMPLETADA — CameraCapture.tsx (shared, reutilizable), Photo2 en backend (Command+Handler), CreateVisitDialog integrado con 2 fotos (foto1 obligatoria, foto2 opcional). Fix VisitRepository: override GetByIdAsync + ThenInclude(Destination) en todos los métodos. GenericRepository: GetByIdAsync virtual. Build: 0 errores.
 - [x] **2.5 Módulo Paquetes** — listado, registrar paquete (con foto + firma al recibir), entregar (con firma del receptor)
 - [x] **2.6 Módulo Dashboard** — 4 KPIs (visitas hoy, activas, paquetes hoy, pendientes), tabla visitas recientes del día, tabla paquetes pendientes. Card de ShadCN instalado. Build: 0 errores.
-- [ ] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin)
+- [x] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin). Tipos, service, hooks, UsersPage, CreateUserDialog, EditUserDialog. Sidebar condicional (solo admin). Fix backend: `GenericRepository.GetAllAsync` → `virtual`; `UserRepository` override con `.Include(u => u.Role)`. Build: 0 errores.
 - [ ] **2.8 Módulo Destinatarios y Representantes**
 - [ ] **2.9 PWA + optimizaciones finales**
 
@@ -91,3 +91,86 @@ applyTo: '\*_/_'
 - Clases Tailwind: usar utilitarios (`max-w-35`, `max-w-30`) en lugar de valores arbitrarios
 
 ### Notas para subfase 2.7 — Usuarios
+
+**Endpoints backend disponibles:**
+
+- `GET /api/users` → `UserResponse[]`
+- `GET /api/users/{id}` → `UserResponse`
+- `POST /api/users` → body: `{ userAccount, password, name, roleId, userCreated }`
+- `PUT /api/users/{id}` → body: `{ id, name, roleId, visible, userModified }`
+- `DELETE /api/users/{id}` → no puede eliminarse a sí mismo (backend valida con `CurrentUserId`)
+- `GET /api/roles` → `RoleResponse[]` (para selector en formularios)
+
+**DTOs backend:**
+
+- `UserResponse`: `{ id, userAccount, name, roleId, roleName, visible }`
+- `RoleResponse`: `{ id, name, visible }`
+
+**Archivos frontend a crear:**
+
+- `features/users/types/user.types.ts`
+- `features/users/api/userService.ts`
+- `features/users/hooks/useUsers.ts`
+- `features/users/UsersPage.tsx`
+- `features/users/components/CreateUserDialog.tsx`
+- `features/users/components/EditUserDialog.tsx`
+
+**Reglas de negocio:**
+
+- Solo visible en sidebar si `roleName` incluye "Admin" (case-insensitive)
+- Al editar: campos `name`, `roleId`, `visible` — sin `password`
+- Al eliminar: el usuario no puede eliminarse a sí mismo (validado también en frontend)
+- `userCreated` / `userModified` → `userId` del `authStore`
+
+**Bugs resueltos en 2.7:**
+
+- `z.coerce.number()` incompatible con resolver RHF → usar `z.number()` + cast manual `Number(v)` en `onChange`
+- `RolesController`/`UsersController` retornan `Ok(result.Value)` (dato crudo) → frontend accede `response.data` directamente (sin `.value`)
+- `GenericRepository.GetAllAsync` sin `virtual` → `UserRepository` no podía hacer override → NullRef en Mapperly (`user.Role.Name`) → 500. Fix: añadir `virtual` a `GetAllAsync` en `GenericRepository`
+
+**Patrón crítico — respuestas del API:**
+
+- `VisitsController` / `PackagesController` → `Ok(result)` → JSON: `{ isSuccess, value, error }` → frontend: `response.data.value`
+- `UsersController` / `RolesController` / `DestinationsController` / `RepresentativesController` → `Ok(result.Value)` → JSON: dato crudo → frontend: `response.data`
+
+**Patrón crítico — NullRef en Mapperly:**
+
+Cada vez que un mapper accede a una navigation property (`entity.NavProp.Field`) y el repositorio genérico no la incluye con `.Include()`, lanza NullReferenceException → 500. Fix: override del método en el repositorio específico con `.Include()`. Ya aplicado en: `VisitRepository`, `PackageRepository`, `UserRepository`.
+
+### Notas para subfase 2.8 — Destinatarios y Representantes
+
+**Endpoints backend disponibles:**
+
+- `GET /api/destinations` → `DestinationResponse[]`
+- `GET /api/destinations/{id}` → `DestinationResponse`
+- `POST /api/destinations` → body: `{ name, userCreated }`
+- `PUT /api/destinations/{id}` → body: `{ id, name, visible, userModified }`
+- `DELETE /api/destinations/{id}`
+- `GET /api/representatives` → `RepresentativeResponse[]`
+- `GET /api/representatives/{id}` → `RepresentativeResponse`
+- `GET /api/representatives/by-destination/{destinationId}` → `RepresentativeResponse[]`
+- `POST /api/representatives` → body: `{ name, destinationId, userCreated }`
+- `PUT /api/representatives/{id}` → body: `{ id, name, destinationId, visible, userModified }`
+- `DELETE /api/representatives/{id}`
+
+**Archivos frontend a crear:**
+
+- `features/destinations/types/destination.types.ts`
+- `features/destinations/api/destinationService.ts` (extender el existente en `visits/api/`)
+- `features/destinations/hooks/useDestinations.ts`
+- `features/destinations/DestinationsPage.tsx`
+- `features/destinations/components/CreateDestinationDialog.tsx`
+- `features/destinations/components/EditDestinationDialog.tsx`
+- `features/representatives/types/representative.types.ts`
+- `features/representatives/api/representativeService.ts`
+- `features/representatives/hooks/useRepresentatives.ts`
+- `features/representatives/RepresentativesPage.tsx`
+- `features/representatives/components/CreateRepresentativeDialog.tsx`
+- `features/representatives/components/EditRepresentativeDialog.tsx`
+
+**Reglas de negocio:**
+
+- Destinatarios y Representantes visibles solo para admin en el sidebar
+- Un representante pertenece a un destinatario (`destinationId`)
+- Al crear/editar representante: select de destinatarios activos
+- `userCreated` / `userModified` → `userId` del `authStore`

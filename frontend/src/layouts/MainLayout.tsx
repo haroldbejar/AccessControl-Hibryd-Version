@@ -1,9 +1,16 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Package, LogOut, Shield } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Package,
+  LogOut,
+  Shield,
+  UserCog,
+} from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
+const baseNavItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/visits", icon: Users, label: "Visitas" },
   { to: "/packages", icon: Package, label: "Paquetes" },
@@ -12,6 +19,12 @@ const navItems = [
 export function MainLayout() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+
+  const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
+
+  const navItems = isAdmin
+    ? [...baseNavItems, { to: "/users", icon: UserCog, label: "Usuarios" }]
+    : baseNavItems;
 
   const handleLogout = () => {
     logout();
