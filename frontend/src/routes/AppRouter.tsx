@@ -1,35 +1,72 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { MainLayout } from "@/layouts/MainLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
-import { VisitsPage } from "@/features/visits/VisitsPage";
-import { PackagesPage } from "@/features/packages/PackagesPage";
-import { DashboardPage } from "@/features/dashboard/DashboardPage";
-import { UsersPage } from "@/features/users/UsersPage";
-import { DestinationsPage } from "@/features/destinations/DestinationsPage";
-import { RepresentativesPage } from "@/features/representatives/RepresentativesPage";
+import { NotFoundPage } from "@/features/errors/NotFoundPage";
+
+const DashboardPage = lazy(() =>
+  import("@/features/dashboard/DashboardPage").then((m) => ({
+    default: m.DashboardPage,
+  })),
+);
+const VisitsPage = lazy(() =>
+  import("@/features/visits/VisitsPage").then((m) => ({
+    default: m.VisitsPage,
+  })),
+);
+const PackagesPage = lazy(() =>
+  import("@/features/packages/PackagesPage").then((m) => ({
+    default: m.PackagesPage,
+  })),
+);
+const UsersPage = lazy(() =>
+  import("@/features/users/UsersPage").then((m) => ({
+    default: m.UsersPage,
+  })),
+);
+const DestinationsPage = lazy(() =>
+  import("@/features/destinations/DestinationsPage").then((m) => ({
+    default: m.DestinationsPage,
+  })),
+);
+const RepresentativesPage = lazy(() =>
+  import("@/features/representatives/RepresentativesPage").then((m) => ({
+    default: m.RepresentativesPage,
+  })),
+);
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[300px]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+    </div>
+  );
+}
 
 export function AppRouter() {
   return (
-    <Routes>
-      {/* Rutas públicas */}
-      <Route path="/login" element={<LoginPage />} />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/login" element={<LoginPage />} />
 
-      {/* Rutas protegidas */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<MainLayout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/visits" element={<VisitsPage />} />
-          <Route path="/packages" element={<PackagesPage />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/destinations" element={<DestinationsPage />} />
-          <Route path="/representatives" element={<RepresentativesPage />} />
+        {/* Rutas protegidas */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/visits" element={<VisitsPage />} />
+            <Route path="/packages" element={<PackagesPage />} />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/representatives" element={<RepresentativesPage />} />
+          </Route>
         </Route>
-      </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Suspense>
   );
 }

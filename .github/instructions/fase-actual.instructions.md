@@ -48,7 +48,7 @@ applyTo: '\*_/_'
 - [x] **2.6 Módulo Dashboard** — 4 KPIs (visitas hoy, activas, paquetes hoy, pendientes), tabla visitas recientes del día, tabla paquetes pendientes. Card de ShadCN instalado. Build: 0 errores.
 - [x] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin). Tipos, service, hooks, UsersPage, CreateUserDialog, EditUserDialog. Sidebar condicional (solo admin). Fix backend: `GenericRepository.GetAllAsync` → `virtual`; `UserRepository` override con `.Include(u => u.Role)`. Build: 0 errores.
 - [x] **2.8 Módulo Destinatarios y Representantes** — Tipos, services, hooks TanStack Query. DestinationsPage (tabla + crear/eliminar). RepresentativesPage (filtro por destinatario, CRUD completo). CreateRepresentativeDialog + EditRepresentativeDialog con sección condicional de vehículo. MainLayout: Building2/ContactRound, rutas solo admin. Build: 0 errores.
-- [ ] **2.9 PWA + optimizaciones finales**
+- [x] **2.9 PWA + optimizaciones finales** — `vite-plugin-pwa` (manifest, Workbox NetworkFirst/CacheFirst, SW autoUpdate), favicon SVG candado (#5B8DEF), lazy loading de rutas (React.lazy + Suspense + PageLoader), NotFoundPage (404 con ShieldAlert), ErrorBoundary global (ShieldX), `index.html` lang=es + theme-color + meta description + título "Access Control". Build: 0 errores. `dist/sw.js` + `dist/workbox-*.js` generados.
 - [x] **2.10.A Paleta Neo Gradient** — Cambio de paleta de colores en `index.css` (variables CSS ShadCN). Solo frontend, sin cambios de lógica.
 
 ### Nota sobre autorización en la arquitectura moderna
