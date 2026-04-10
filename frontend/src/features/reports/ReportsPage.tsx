@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { pdf } from "@react-pdf/renderer";
-import { FileBarChart2, Download, Loader2 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { pdf, PDFViewer } from "@react-pdf/renderer";
+import { FileBarChart2, Download, Loader2, Eye, EyeOff } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/features/auth/store/authStore";
@@ -48,6 +48,7 @@ export function ReportsPage() {
   const [startDate, setStartDate] = useState(firstOfMonth());
   const [endDate, setEndDate] = useState(today());
   const [downloading, setDownloading] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   const dateParams = { startDate, endDate };
   const needsDates = TABS_WITH_DATES.includes(activeTab);
@@ -153,6 +154,53 @@ export function ReportsPage() {
 
   const canDownload = !!currentData && !isLoading;
 
+  // Documento activo para la vista previa — se recalcula sólo cuando cambian los datos
+  const previewDocument = useMemo(() => {
+    const gen = nowLabel();
+    if (activeTab === "r1" && r1.data)
+      return (
+        <VisitsPdf
+          data={r1.data}
+          startDate={startDate}
+          endDate={endDate}
+          generatedAt={gen}
+        />
+      );
+    if (activeTab === "r2" && r2.data)
+      return (
+        <VehicleVisitsPdf
+          data={r2.data}
+          startDate={startDate}
+          endDate={endDate}
+          generatedAt={gen}
+        />
+      );
+    if (activeTab === "r3" && r3.data)
+      return <PendingPackagesPdf data={r3.data} generatedAt={gen} />;
+    if (activeTab === "r4" && r4.data)
+      return (
+        <PackagesHistoryPdf
+          data={r4.data}
+          startDate={startDate}
+          endDate={endDate}
+          generatedAt={gen}
+        />
+      );
+    if (activeTab === "r5" && r5.data)
+      return <ActivitySummaryPdf data={r5.data} generatedAt={gen} />;
+    return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    activeTab,
+    r1.data,
+    r2.data,
+    r3.data,
+    r4.data,
+    r5.data,
+    startDate,
+    endDate,
+  ]);
+
   return (
     <div className="space-y-6">
       {/* Encabezado */}
@@ -161,7 +209,7 @@ export function ReportsPage() {
         <div>
           <h1 className="text-xl font-semibold">Reportes</h1>
           <p className="text-sm text-muted-foreground">
-            Genera y descarga informes en PDF
+            Visualiza y descarga informes en PDF
           </p>
         </div>
       </div>
@@ -192,22 +240,41 @@ export function ReportsPage() {
             </p>
           )}
 
-          <Button
-            onClick={handleDownload}
-            disabled={!canDownload || downloading}
-            className="gap-2 shrink-0"
-          >
-            {downloading || isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
-            {downloading
-              ? "Generando..."
-              : isLoading
-                ? "Cargando datos..."
-                : "Descargar PDF"}
-          </Button>
+          <div className="flex gap-2 shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowPreview((v) => !v)}
+              className="gap-2"
+            >
+              {showPreview ? (
+                <>
+                  <EyeOff className="h-4 w-4" />
+                  Ocultar vista previa
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4" />
+                  Ver vista previa
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={handleDownload}
+              disabled={!canDownload || downloading}
+              className="gap-2"
+            >
+              {downloading || isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {downloading
+                ? "Generando..."
+                : isLoading
+                  ? "Cargando datos..."
+                  : "Descargar PDF"}
+            </Button>
+          </div>
         </div>
 
         {/* Previews por tab (resumen de datos cargados) */}
@@ -271,6 +338,26 @@ export function ReportsPage() {
           </TabsContent>
         )}
       </Tabs>
+
+      {/* Vista previa PDF inline */}
+      {showPreview && previewDocument && (
+        <div
+          className="rounded-lg border overflow-hidden"
+          style={{ height: 640 }}
+        >
+          <PDFViewer width="100%" height="100%" showToolbar>
+            {previewDocument}
+          </PDFViewer>
+        </div>
+      )}
+      {showPreview && !previewDocument && !isLoading && (
+        <div
+          className="rounded-lg border bg-card flex items-center justify-center text-muted-foreground text-sm"
+          style={{ height: 200 }}
+        >
+          Selecciona el rango de fechas para previsualizar el informe.
+        </div>
+      )}
     </div>
   );
 }
