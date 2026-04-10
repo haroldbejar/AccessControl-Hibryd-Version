@@ -42,8 +42,8 @@ applyTo: '\*_/_'
 - [x] **2.2 Infraestructura base** — Axios (interceptores JWT/401), Zustand authStore (persist localStorage), TanStack Query (QueryClient), React Router (BrowserRouter), ProtectedRoute, MainLayout (sidebar + topbar), AppRouter. Build: 0 errores.
 - [x] **2.3 Autenticación** — authService (POST /api/auth/login), LoginPage (RHF + Zod, toggle password, spinner, toast), guard de ruta, prueba e2e exitosa admin/Admin123!. Build: 0 errores.
 - [x] **2.4 Módulo Visitas** — tipos TS (`VehicleTypeEnum` const-object, `VisitResponse`, `CreateVisitRequest`, `CheckOutRequest`), visitService + destinationService + representativeService, hooks TanStack Query (useVisits, useVisitByDocument, useCreateVisit, useCheckOut, useDestinations, useRepresentativesByDestination), VisitsPage (tabla paginada, filtros fecha/documento/nombre, contadores), CreateVisitDialog (RHF+Zod, destino→representante dinámico, vehículo condicional), CheckOutDialog (búsqueda por documento, preview, confirmación). ShadCN: dialog, badge, select, label, input. Build: 0 errores.
-- [ ] **2.4.1 Captura de imágenes en visitas** ⚠️ PENDIENTE (ajuste planificado antes de 2.5)
-- [ ] **2.5 Módulo Paquetes** — listado, registrar paquete, entregar
+- [x] **2.4.1 Captura de imágenes en visitas** ✅ COMPLETADA — CameraCapture.tsx (shared, reutilizable), Photo2 en backend (Command+Handler), CreateVisitDialog integrado con 2 fotos (foto1 obligatoria, foto2 opcional). Fix VisitRepository: override GetByIdAsync + ThenInclude(Destination) en todos los métodos. GenericRepository: GetByIdAsync virtual. Build: 0 errores.
+- [x] **2.5 Módulo Paquetes** — listado, registrar paquete (con foto + firma al recibir), entregar (con firma del receptor)
 - [ ] **2.6 Módulo Dashboard** — estadísticas, visitas recientes
 - [ ] **2.7 Módulo Usuarios** — CRUD usuarios (solo admin)
 - [ ] **2.8 Módulo Destinatarios y Representantes**
@@ -62,7 +62,7 @@ applyTo: '\*_/_'
 
 ### Frontend (`frontend/`)
 
-- Dev server: `npx vite` → `http://localhost:5173`
+- Dev server: `npx vite` → `http://localhost:5174`
 - Build: `npm run build`
 - TailwindCSS v4 via `@tailwindcss/vite` (sin postcss.config)
 - `ignoreDeprecations: "6.0"` en tsconfig para `baseUrl` (TS6)
@@ -70,25 +70,37 @@ applyTo: '\*_/_'
 - Zustand key en localStorage: `access-control-auth`
 - `AuthUser`: `{ userId, name, userAccount, roleName }` (campo `name`, no `userName`)
 
-### Ajuste planificado: 2.4.1 — Captura de imágenes en CreateVisitDialog
+### Ajuste completado: 2.4.1 — Captura de imágenes ✅
 
-**Contexto:** Backend ya soporta `Photo: byte[]?` en entidad/command/handler. Falta añadir `Photo2` y el UI completo.
+- Fotos transmitidas como **base64 puro** en JSON body
+- `Photo` obligatoria, `Photo2` opcional
+- `CameraCapture` en `shared/components/` — reutilizable (paquetes, etc.)
+- Backend: `GenericRepository.GetByIdAsync` virtual; `VisitRepository` override con ThenInclude(Destination)
 
-**Decisiones de diseño:**
+### Fix global: DateTime.UtcNow → DateTime.Now ✅
 
-- Fotos se transmiten como **base64 puro** en el JSON body (no multipart) — consistente con endpoint actual
-- `Photo` (foto 1): **obligatoria**. `Photo2` (foto 2): **opcional**
-- Compresión cliente: canvas 640×480, JPEG quality 0.8
-- Selección de dispositivo: `navigator.mediaDevices.enumerateDevices()` filtrado a `videoinput`
-- `CameraCapture` va en `shared/components/` — reutilizable en otros módulos (paquetes, etc.)
+- `CheckIn`, `CheckOut` (Visits), `ReceivedDate`, `DeliveryDate` (Packages) usan `DateTime.Now`
+- Razón: Colombia es UTC-5; con UtcNow los registros caían en el día siguiente en la BD y el filtro de fecha del frontend (hora local) nunca los encontraba
+- Fix aplicado en: `CreateVisitCommandHandler`, `CheckOutVisitCommandHandler`, `CreatePackageCommandHandler`, `PackageRepository.DeliverPackageAsync`
 
-**Archivos a modificar — Backend:**
+### Notas para subfase 2.6 — Dashboard
 
-- `Commands/CreateVisit/CreateVisitCommand.cs` — añadir `byte[]? Photo2` después de `Photo`
-- `Commands/CreateVisit/CreateVisitCommandHandler.cs` — añadir `Photo2 = request.Photo2`
+**Firmas digitales — backend ya implementado:**
 
-**Archivos a modificar — Frontend:**
+- Entidad `Package` tiene dos campos: `ReceiverSignature: byte[]?` (al registrar) y `DeliverySignature: byte[]?` (al entregar)
+- `DeliverPackageCommand` ya acepta `byte[]? DeliverySignature`
+- `PackageResponse` devuelve ambas firmas
 
-- `shared/components/CameraCapture.tsx` ← NUEVO
-- `features/visits/types/visit.types.ts` — añadir `photo?: string`, `photo2?: string` a `CreateVisitRequest`
-- `features/visits/components/CreateVisitDialog.tsx` — integrar dos `CameraCapture`, estado local, validación Zod
+**Componente `SignatureCapture` (nuevo — shared):**
+
+- Canvas táctil/mouse para dibujar firma a mano
+- Exporta como base64 puro (igual que `CameraCapture`)
+- Botones: Limpiar / Confirmar firma
+- Opcional: mostrar firma capturada como preview
+
+**Flujo paquetes:**
+
+- `POST /api/packages` — registrar: foto del paquete (`Photo`) + firma al recibir (`ReceiverSignature`, opcional)
+- `PATCH /api/packages/{id}/deliver` — entregar: firma del receptor (`DeliverySignature`, opcional)
+- `GET /api/packages` — listar con filtros: startDate, endDate, controlNumber, senderName, destinationId, status
+- `GET /api/packages/pending` — solo pendientes de entrega

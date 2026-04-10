@@ -42,6 +42,7 @@ public class CreateVisitCommandHandlerTests
         Color: null,
         Plate: null,
         Photo: null,
+        Photo2: null,
         UserCreated: 1
     );
 
@@ -157,7 +158,7 @@ public class CreateVisitCommandHandlerTests
             RepresentativeId: 1,
             HasVehicle: false,
             VehicleTypeId: VehicleTypeEnum.NA,
-            Brand: null, Model: null, Color: null, Plate: null, Photo: null,
+            Brand: null, Model: null, Color: null, Plate: null, Photo: null, Photo2: null,
             UserCreated: 1);
 
         await _handler.Handle(command, CancellationToken.None);

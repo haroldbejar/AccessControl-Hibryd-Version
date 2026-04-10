@@ -10,6 +10,17 @@ public sealed class PackageRepository : GenericRepository<Package>, IPackageRepo
     public PackageRepository(AppDbContext context) : base(context) { }
 
     /// <summary>
+    /// Carga un paquete por Id incluyendo Destination y Representative (necesario para el mapper).
+    /// </summary>
+    public override async Task<Package?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+        => await _dbSet
+            .Include(p => p.Destination)
+            .Include(p => p.Representative)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+    /// <summary>
     /// Filtra paquetes por rango de fecha, número de control, remitente, destino y estado.
     /// </summary>
     public async Task<IEnumerable<Package>> GetAllFilteredAsync(
@@ -76,7 +87,7 @@ public sealed class PackageRepository : GenericRepository<Package>, IPackageRepo
             return false;
 
         package.Status = PackagesStatusEnum.Delivered;
-        package.DeliveryDate = DateTime.UtcNow;
+        package.DeliveryDate = DateTime.Now;
         package.DeliveredTo = deliveredTo;
         package.DeliveredToDocument = deliveredToDocument;
         package.DeliverySignature = deliverySignature;

@@ -23,7 +23,7 @@ public sealed class CheckOutVisitCommandHandler : IRequestHandler<CheckOutVisitC
         if (visit.CheckOut.HasValue)
             return Result.Failure("La visita ya registró su salida.");
 
-        visit.CheckOut = DateTime.UtcNow;
+        visit.CheckOut = DateTime.Now;
         visit.UserModified = request.UserModified;
 
         await _uow.Visits.UpdateAsync(visit, cancellationToken);

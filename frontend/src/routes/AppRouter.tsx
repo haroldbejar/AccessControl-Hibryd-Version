@@ -3,13 +3,11 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { MainLayout } from "@/layouts/MainLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { VisitsPage } from "@/features/visits/VisitsPage";
+import { PackagesPage } from "@/features/packages/PackagesPage";
 
 // Placeholders — serán reemplazados en subfases siguientes
 const DashboardPage = () => (
   <div className="text-xl font-semibold">Dashboard</div>
-);
-const PackagesPage = () => (
-  <div className="text-xl font-semibold">Paquetes</div>
 );
 
 export function AppRouter() {
