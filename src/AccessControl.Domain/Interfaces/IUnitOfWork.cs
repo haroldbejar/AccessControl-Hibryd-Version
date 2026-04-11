@@ -16,6 +16,8 @@ namespace AccessControl.Domain.Interfaces
         IRepresentativeRepository Representatives { get; }
         IDestinationRepository Destinations { get; }
         IRoleRepository Roles { get; }
+        ICommonAreaRepository CommonAreas { get; }
+        IReservationRepository Reservations { get; }
 
         // Transacciones
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

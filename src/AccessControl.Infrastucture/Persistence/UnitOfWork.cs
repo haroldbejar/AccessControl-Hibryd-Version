@@ -16,6 +16,8 @@ public sealed class UnitOfWork : IUnitOfWork
     private IRepresentativeRepository? _representatives;
     private IDestinationRepository? _destinations;
     private IRoleRepository? _roles;
+    private ICommonAreaRepository? _commonAreas;
+    private IReservationRepository? _reservations;
 
     public UnitOfWork(AppDbContext context)
     {
@@ -39,6 +41,13 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public IRoleRepository Roles
         => _roles ??= new RoleRepository(_context);
+
+    // Pendiente Fase B — implementación completa de repositorios
+    public ICommonAreaRepository CommonAreas
+        => _commonAreas ?? throw new NotImplementedException("CommonAreaRepository will be implemented in Fase B.");
+
+    public IReservationRepository Reservations
+        => _reservations ?? throw new NotImplementedException("ReservationRepository will be implemented in Fase B.");
 
     // --- Persistencia ---
 
