@@ -39,7 +39,7 @@ Gestión de reservas de zonas comunes (salón comunal, BBQ, zona de juegos, etc.
 - [x] **Fase B** — Infrastructure: EF Core configs, repositorios, migración, DI ✅ Build: 0 errores
 - [x] **Fase C** — Application CQRS: DTOs, commands, queries, validators ✅ Build: 0 errores
 - [x] **Fase D** — API Controllers (2 controllers, 11 endpoints) ✅ Build: 0 errores
-- [ ] **Fase E** — Frontend base: tipos, services, hooks
+- [x] **Fase E** — Frontend base: tipos, services, hooks ✅ Build: 0 errores
 - [ ] **Fase F** — Frontend UI: páginas y componentes
 
 ---
