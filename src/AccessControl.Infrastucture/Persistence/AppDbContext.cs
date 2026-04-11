@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Representative> Representatives => Set<Representative>();
     public DbSet<Mail> Mails => Set<Mail>();
     public DbSet<Stencil> Stencils => Set<Stencil>();
+    public DbSet<CommonArea> CommonAreas => Set<CommonArea>();
+    public DbSet<Reservation> Reservations => Set<Reservation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

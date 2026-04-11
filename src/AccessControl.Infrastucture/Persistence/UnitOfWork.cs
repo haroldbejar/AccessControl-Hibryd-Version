@@ -42,12 +42,11 @@ public sealed class UnitOfWork : IUnitOfWork
     public IRoleRepository Roles
         => _roles ??= new RoleRepository(_context);
 
-    // Pendiente Fase B — implementación completa de repositorios
     public ICommonAreaRepository CommonAreas
-        => _commonAreas ?? throw new NotImplementedException("CommonAreaRepository will be implemented in Fase B.");
+        => _commonAreas ??= new CommonAreaRepository(_context);
 
     public IReservationRepository Reservations
-        => _reservations ?? throw new NotImplementedException("ReservationRepository will be implemented in Fase B.");
+        => _reservations ??= new ReservationRepository(_context);
 
     // --- Persistencia ---
 
