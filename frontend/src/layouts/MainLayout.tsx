@@ -9,6 +9,8 @@ import {
   Building2,
   ContactRound,
   FileBarChart2,
+  CalendarDays,
+  MapPin,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,7 @@ const baseNavItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/visits", icon: Users, label: "Visitas" },
   { to: "/packages", icon: Package, label: "Paquetes" },
+  { to: "/reservations", icon: CalendarDays, label: "Reservas" },
   { to: "/reports", icon: FileBarChart2, label: "Reportes" },
 ];
 
@@ -29,6 +32,7 @@ export function MainLayout() {
   const adminNavItems = [
     { to: "/destinations", icon: Building2, label: "Destinatarios" },
     { to: "/representatives", icon: ContactRound, label: "Representantes" },
+    { to: "/common-areas", icon: MapPin, label: "Zonas comunes" },
     { to: "/users", icon: UserCog, label: "Usuarios" },
   ];
 

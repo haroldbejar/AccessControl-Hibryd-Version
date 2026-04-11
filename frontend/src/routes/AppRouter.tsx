@@ -40,6 +40,16 @@ const ReportsPage = lazy(() =>
     default: m.ReportsPage,
   })),
 );
+const ReservationsPage = lazy(() =>
+  import("@/features/reservations/ReservationsPage").then((m) => ({
+    default: m.ReservationsPage,
+  })),
+);
+const CommonAreasPage = lazy(() =>
+  import("@/features/reservations/CommonAreasPage").then((m) => ({
+    default: m.CommonAreasPage,
+  })),
+);
 
 function PageLoader() {
   return (
@@ -67,6 +77,8 @@ export function AppRouter() {
             <Route path="/destinations" element={<DestinationsPage />} />
             <Route path="/representatives" element={<RepresentativesPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/reservations" element={<ReservationsPage />} />
+            <Route path="/common-areas" element={<CommonAreasPage />} />
           </Route>
         </Route>
 
