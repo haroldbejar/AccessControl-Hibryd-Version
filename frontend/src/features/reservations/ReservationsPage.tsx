@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, List, Grid } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -48,14 +48,24 @@ export function ReservationsPage() {
 
   /* Queries */
   const { data: areas = [] } = useCommonAreas();
-  const { data: availability, isLoading: loadingGrid } = useAvailability(
-    commonAreaId,
-    date,
+
+  // Solo activa la query de la vista actual para evitar peticiones innecesarias.
+  // useMemo estabiliza el objeto — sin esto, nuevo reference cada render inestabiliza el queryKey.
+  const listFilters = useMemo(
+    () => ({
+      date: date || undefined,
+      commonAreaId: commonAreaId ?? undefined,
+    }),
+    [date, commonAreaId],
   );
-  const { data: reservations = [], isLoading: loadingList } = useReservations({
-    date: date || undefined,
-    commonAreaId: commonAreaId ?? undefined,
-  });
+  const { data: availability, isLoading: loadingGrid } = useAvailability(
+    view === "grid" ? commonAreaId : null,
+    view === "grid" ? date : null,
+  );
+  const { data: reservations = [], isLoading: loadingList } = useReservations(
+    listFilters,
+    view === "list",
+  );
 
   /* Mutations (gestionadas en la página) */
   const confirmMutation = useConfirmReservation();

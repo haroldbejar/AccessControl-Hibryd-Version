@@ -40,7 +40,23 @@ Gestión de reservas de zonas comunes (salón comunal, BBQ, zona de juegos, etc.
 - [x] **Fase C** — Application CQRS: DTOs, commands, queries, validators ✅ Build: 0 errores
 - [x] **Fase D** — API Controllers (2 controllers, 11 endpoints) ✅ Build: 0 errores
 - [x] **Fase E** — Frontend base: tipos, services, hooks ✅ Build: 0 errores
-- [ ] **Fase F** — Frontend UI: páginas y componentes
+- [x] **Fase F** — Frontend UI: páginas y componentes ✅ Build: 0 errores
+
+### Bugs resueltos post-implementación
+
+**Bug 1 — Loop infinito en `GetAvailabilityQueryHandler` (OutOfMemoryException → 500)**
+
+- `TimeOnly.AddHours(1)` envuelve la medianoche sin excepción: si `ClosingTime >= 23:00`, al llegar a las 23:00 `AddHours(1)` retorna `00:00`, y `00:00 <= 23:xx` es siempre verdadero → loop infinito → OOM.
+- Fix: aritmética entera de minutos. `currentMinutes + 60 <= closingMinutes` no puede envolver.
+- Archivo: `GetAvailabilityQueryHandler.cs` línea 38.
+
+**Bug 2 — Cascada de peticiones HTTP que saturaba CPU (frontend)**
+
+- `useReservations` y `useAvailability` activos simultáneamente aunque solo se usara una vista.
+- `staleTime: 1000 * 30` (30s) demasiado agresivo + `refetchOnWindowFocus` global.
+- Objeto `filters` recreado en cada render → queryKey inestable → refetch constante.
+- Fix: `enabled: view === "list"` / `enabled: view === "grid"` según vista activa; eliminado `staleTime` local (usa global de 5min); `useMemo` para estabilizar el objeto `filters`.
+- Archivos: `useReservations.ts`, `ReservationsPage.tsx`.
 
 ---
 

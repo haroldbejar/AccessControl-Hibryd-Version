@@ -26,11 +26,16 @@ public sealed class GetAvailabilityQueryHandler : IRequestHandler<GetAvailabilit
             cancellationToken);
 
         var slots = new List<AvailabilitySlot>();
-        var current = area.OpeningTime;
 
-        while (current.AddHours(1) <= area.ClosingTime)
+        // Usar aritmética entera de minutos para evitar el wrapping de medianoche
+        // que causa un loop infinito con TimeOnly.AddHours cuando ClosingTime >= 23:00.
+        var currentMinutes = area.OpeningTime.Hour * 60 + area.OpeningTime.Minute;
+        var closingMinutes = area.ClosingTime.Hour * 60 + area.ClosingTime.Minute;
+
+        while (currentMinutes + 60 <= closingMinutes)
         {
-            var next = current.AddHours(1);
+            var current = new TimeOnly(currentMinutes / 60, currentMinutes % 60);
+            var next = new TimeOnly((currentMinutes + 60) / 60, (currentMinutes + 60) % 60);
 
             var occupying = reservations.FirstOrDefault(
                 r => r.StartTime <= current && r.EndTime > current);
@@ -44,7 +49,7 @@ public sealed class GetAvailabilityQueryHandler : IRequestHandler<GetAvailabilit
                 DestinationName: occupying?.Destination?.Name,
                 Status: occupying != null ? (int)occupying.Status : null));
 
-            current = next;
+            currentMinutes += 60;
         }
 
         var response = new AvailabilityResponse(

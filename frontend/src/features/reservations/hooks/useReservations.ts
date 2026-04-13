@@ -15,11 +15,11 @@ export const reservationKeys = {
     ["reservations", "availability", commonAreaId, date] as const,
 };
 
-export function useReservations(filters?: ReservationFilters) {
+export function useReservations(filters?: ReservationFilters, enabled = true) {
   return useQuery({
     queryKey: reservationKeys.list(filters),
     queryFn: () => reservationService.getAll(filters),
-    staleTime: 1000 * 30,
+    enabled,
   });
 }
 
@@ -31,7 +31,6 @@ export function useAvailability(
     queryKey: reservationKeys.availability(commonAreaId ?? 0, date ?? ""),
     queryFn: () => reservationService.getAvailability(commonAreaId!, date!),
     enabled: !!commonAreaId && !!date,
-    staleTime: 1000 * 30,
   });
 }
 
