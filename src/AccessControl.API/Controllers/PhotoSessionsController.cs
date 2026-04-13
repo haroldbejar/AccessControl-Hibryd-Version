@@ -1,3 +1,5 @@
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using AccessControl.API.Hubs;
 using AccessControl.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +27,14 @@ public class PhotoSessionsController : ControllerBase
     public IActionResult CreateSession()
     {
         var (sessionId, token) = _sessionService.CreateSession();
-        return Ok(new { sessionId, token });
+        var networkIp = NetworkInterface.GetAllNetworkInterfaces()
+            .Where(ni => ni.OperationalStatus == OperationalStatus.Up &&
+                         ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+            .SelectMany(ni => ni.GetIPProperties().UnicastAddresses)
+            .Where(ua => ua.Address.AddressFamily == AddressFamily.InterNetwork)
+            .Select(ua => ua.Address.ToString())
+            .FirstOrDefault() ?? "localhost";
+        return Ok(new { sessionId, token, networkIp });
     }
 
     /// <summary>Recibe la foto desde el celular. Ruta pública (sin JWT).</summary>

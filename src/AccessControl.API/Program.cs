@@ -35,12 +35,15 @@ try
     builder.Services.AddSingleton<PhotoSessionService>();
 
     // ─── CORS ────────────────────────────────────────────────────────────────
+    // SetIsOriginAllowed(_ => true) + AllowCredentials es requerido para SignalR:
+    // SignalR usa credentials:'include' en negotiate, incompatible con AllowAnyOrigin().
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", policy =>
-            policy.AllowAnyOrigin()
+            policy.SetIsOriginAllowed(_ => true)
                   .AllowAnyMethod()
-                  .AllowAnyHeader());
+                  .AllowAnyHeader()
+                  .AllowCredentials());
     });
 
     // ─── Swagger / OpenAPI ───────────────────────────────────────────────────

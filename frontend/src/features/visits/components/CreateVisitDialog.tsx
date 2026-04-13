@@ -27,7 +27,7 @@ import {
   useDestinations,
   useRepresentativesByDestination,
 } from "../hooks/useVisits";
-import { CameraCapture } from "@/shared/components/CameraCapture";
+import { PhotoCapture } from "@/shared/components/PhotoCapture";
 
 const schema = z
   .object({
@@ -328,7 +328,7 @@ export function CreateVisitDialog({ open, onClose }: Props) {
           {/* Fotografías */}
           <div className="space-y-3 border-t border-border pt-3">
             <p className="text-sm font-medium">Fotografías</p>
-            <CameraCapture
+            <PhotoCapture
               key={`photo1-${open}`}
               label="Foto del visitante"
               required
@@ -339,7 +339,7 @@ export function CreateVisitDialog({ open, onClose }: Props) {
             {errors.photo && (
               <p className="text-xs text-destructive">{errors.photo.message}</p>
             )}
-            <CameraCapture
+            <PhotoCapture
               key={`photo2-${open}`}
               label="Foto adicional (opcional)"
               onCapture={(b64) => setValue("photo2", b64 ?? "")}
