@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { format, startOfDay, endOfDay } from "date-fns";
 import { es } from "date-fns/locale";
-import { Users, Package, LogIn, Clock } from "lucide-react";
+import { Users, Package, LogIn, Clock, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useVisits } from "@/features/visits/hooks/useVisits";
@@ -9,10 +9,16 @@ import {
   usePackages,
   usePendingPackages,
 } from "@/features/packages/hooks/usePackages";
+import { useReservations } from "@/features/reservations/hooks/useReservations";
+import {
+  reservationStatusLabels,
+  reservationStatusColors,
+} from "@/features/reservations/types/reservation.types";
 
 // Helpers de fecha
 const todayStart = format(startOfDay(new Date()), "yyyy-MM-dd'T'HH:mm:ss");
 const todayEnd = format(endOfDay(new Date()), "yyyy-MM-dd'T'HH:mm:ss");
+const todayDate = format(new Date(), "yyyy-MM-dd");
 
 export function DashboardPage() {
   const visitsQuery = useVisits({ startDate: todayStart, endDate: todayEnd });
@@ -21,6 +27,7 @@ export function DashboardPage() {
     endDate: todayEnd,
   });
   const pendingQuery = usePendingPackages();
+  const reservationsQuery = useReservations({ date: todayDate });
 
   const visits = visitsQuery.data ?? [];
   const packages = packagesQuery.data ?? [];
@@ -37,6 +44,13 @@ export function DashboardPage() {
   const recentPending = useMemo(
     () => [...pending].sort((a, b) => b.id - a.id).slice(0, 8),
     [pending],
+  );
+  const todayReservations = useMemo(
+    () =>
+      [...(reservationsQuery.data ?? [])]
+        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+        .slice(0, 8),
+    [reservationsQuery.data],
   );
 
   const today = format(new Date(), "EEEE, d 'de' MMMM yyyy", { locale: es });
@@ -231,6 +245,73 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Reservas de hoy */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary" />
+            Reservas de hoy
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {reservationsQuery.isLoading ? (
+            <p className="px-6 py-4 text-sm text-muted-foreground">
+              Cargando...
+            </p>
+          ) : todayReservations.length === 0 ? (
+            <p className="px-6 py-4 text-sm text-muted-foreground">
+              Sin reservas para hoy.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/40">
+                    <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                      Zona
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                      Residente
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                      Horario
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                      Estado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {todayReservations.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="border-b last:border-0 hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="px-4 py-2 max-w-35 truncate">
+                        {r.commonAreaName}
+                      </td>
+                      <td className="px-4 py-2 max-w-35 truncate text-muted-foreground">
+                        {r.representativeName}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap text-muted-foreground">
+                        {r.startTime} → {r.endTime}
+                      </td>
+                      <td className="px-4 py-2">
+                        <Badge
+                          className={`text-xs ${reservationStatusColors[r.status]} hover:${reservationStatusColors[r.status]}`}
+                        >
+                          {reservationStatusLabels[r.status]}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

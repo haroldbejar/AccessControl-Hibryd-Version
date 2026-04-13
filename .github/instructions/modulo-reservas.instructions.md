@@ -41,6 +41,7 @@ Gestión de reservas de zonas comunes (salón comunal, BBQ, zona de juegos, etc.
 - [x] **Fase D** — API Controllers (2 controllers, 11 endpoints) ✅ Build: 0 errores
 - [x] **Fase E** — Frontend base: tipos, services, hooks ✅ Build: 0 errores
 - [x] **Fase F** — Frontend UI: páginas y componentes ✅ Build: 0 errores
+- [x] **Fase G** — Card "Reservas de hoy" en Dashboard ✅ Build: 0 errores
 
 ### Bugs resueltos post-implementación
 
@@ -57,6 +58,75 @@ Gestión de reservas de zonas comunes (salón comunal, BBQ, zona de juegos, etc.
 - Objeto `filters` recreado en cada render → queryKey inestable → refetch constante.
 - Fix: `enabled: view === "list"` / `enabled: view === "grid"` según vista activa; eliminado `staleTime` local (usa global de 5min); `useMemo` para estabilizar el objeto `filters`.
 - Archivos: `useReservations.ts`, `ReservationsPage.tsx`.
+
+---
+
+## Fase G — Card "Reservas de hoy" en Dashboard
+
+> Plan aprobado. Pendiente de implementación.
+
+**Objetivo:** Añadir una Card con tabla de reservas de zonas comunes del día actual en `DashboardPage.tsx`, sin crear archivos nuevos ni endpoints nuevos.
+
+### Archivo a modificar
+
+- `frontend/src/features/dashboard/DashboardPage.tsx`
+
+### Cambios a aplicar
+
+1. **Nuevos imports:**
+    - `useReservations` desde `@/features/reservations/hooks/useReservations`
+    - `reservationStatusLabels`, `reservationStatusColors` desde `@/features/reservations/types/reservation.types`
+    - Ícono `CalendarDays` de `lucide-react`
+
+2. **Variable de fecha del día:**
+
+    ```ts
+    const todayDate = format(new Date(), "yyyy-MM-dd");
+    ```
+
+    Formato que acepta `GET /api/reservations?date=` (distinto a `todayStart`/`todayEnd` que son ISO datetime).
+
+3. **Hook:**
+
+    ```ts
+    const reservationsQuery = useReservations({ date: todayDate });
+    ```
+
+4. **Derivar lista con `useMemo`:**
+
+    ```ts
+    const todayReservations = useMemo(
+        () =>
+            [...(reservationsQuery.data ?? [])]
+                .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                .slice(0, 8),
+        [reservationsQuery.data],
+    );
+    ```
+
+5. **Nueva Card (dentro del grid `grid-cols-1 xl:grid-cols-2`):**
+    - Header: ícono `CalendarDays` + "Reservas de hoy"
+    - Columnas: Zona | Residente | Horario (`startTime → endTime`) | Estado
+    - Badge de estado: clase dinámica con `reservationStatusColors[r.status]` + texto `reservationStatusLabels[r.status]`
+    - Estado cargando: "Cargando..."
+    - Sin datos: "Sin reservas para hoy."
+
+### Decisiones de diseño
+
+| Decisión         | Valor                                                                        |
+| ---------------- | ---------------------------------------------------------------------------- |
+| Estados visibles | Todos (Pending, Confirmed, Completed, Cancelled) — visión completa del día   |
+| Orden            | Por `startTime` ascendente (cronológico)                                     |
+| Límite de filas  | 8 (misma convención que tablas de visitas y paquetes)                        |
+| Posición         | 3ª card en el grid: en XL queda sola en su fila (full-width); en móvil apila |
+| Archivos nuevos  | Ninguno — reutiliza hook, service y tipos existentes                         |
+| Endpoints nuevos | Ninguno — reutiliza `GET /api/reservations?date=yyyy-MM-dd`                  |
+
+### Verificación
+
+- `npm run build` → 0 errores
+- Dashboard en browser → card visible y funcional
+- Badges de estado con colores correctos
 
 ---
 
