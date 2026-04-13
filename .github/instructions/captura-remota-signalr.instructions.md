@@ -14,25 +14,25 @@ Permitir que el formulario del PC (visitas, paquetes) abra una sesión temporal 
 
 ## Decisiones de arquitectura confirmadas
 
-| Decisión            | Valor                                                             |
-| ------------------- | ----------------------------------------------------------------- |
-| Storage fotos       | Base64 en MySQL (sin cambio, igual que hoy)                       |
-| Cámara móvil        | `<input type="file" accept="image/*" capture="environment">`      |
-| Sesiones            | `ConcurrentDictionary` singleton, expiran 10 min                  |
-| Seguridad           | `sessionId` + `token` (GUIDs) en QR URL                           |
-| NuGet nuevos        | Ninguno (SignalR incluido en ASP.NET Core)                        |
-| NPM nuevos          | `@microsoft/signalr` + `react-qr-code` (con `--legacy-peer-deps`) |
-| `CameraCapture.tsx` | Intacto — embebido dentro del nuevo `PhotoCapture.tsx`            |
-| CORS                | `AllowAnyOrigin` en development (red local)                       |
-| Ruta móvil          | `/capture/:sessionId?token=xxx` — pública (sin JWT)               |
+| Decisión            | Valor                                                            |
+| ------------------- | ---------------------------------------------------------------- |
+| Storage fotos       | Base64 en MySQL (sin cambio, igual que hoy)                      |
+| Cámara móvil        | `<input type="file" accept="image/*" capture="environment">`     |
+| Sesiones            | `ConcurrentDictionary` singleton, expiran 10 min                 |
+| Seguridad           | `sessionId` + `token` (GUIDs) en QR URL                          |
+| NuGet nuevos        | Ninguno (SignalR incluido en ASP.NET Core)                       |
+| NPM nuevos          | `@microsoft/signalr` + `qrcode.react` (con `--legacy-peer-deps`) |
+| `CameraCapture.tsx` | Intacto — embebido dentro del nuevo `PhotoCapture.tsx`           |
+| CORS                | `SetIsOriginAllowed(_ => true)` + `AllowCredentials()` en dev    |
+| Ruta móvil          | `/capture/:sessionId?token=xxx` — pública (sin JWT)              |
 
 ---
 
 ## Estado de implementación
 
-- [ ] **Fase A** — Backend: Hub, servicio de sesiones, controlador, Program.cs
-- [ ] **Fase B** — Frontend PC: hook, componente PhotoCapture, integración en dialogs
-- [ ] **Fase C** — Frontend Móvil: MobileCapturePage
+- [x] **Fase A** — Backend: Hub, servicio de sesiones, controlador, Program.cs
+- [x] **Fase B** — Frontend PC: hook, componente PhotoCapture, integración en dialogs
+- [x] **Fase C** — Frontend Móvil: MobileCapturePage
 
 ---
 
@@ -534,9 +534,9 @@ frontend/src/
 
 ## Verificación por fase
 
-- **Fase A:** `dotnet build` → 0 errores. Probar `POST /api/photo-sessions` con JWT, verificar respuesta `{ sessionId, token }`.
-- **Fase B:** `npm run build` → 0 errores. Abrir dialog de visita → "Usar celular" → aparece QR.
-- **Fase C:** `npx vite --host` → celular escanea QR → toma foto → foto aparece en PC.
+- **Fase A:** `dotnet build` → 0 errores. Probar `POST /api/photo-sessions` con JWT, verificar respuesta `{ sessionId, token, networkIp }`.
+- **Fase B:** `npm run build` → 0 errores. Abrir dialog de visita → "Usar celular" → aparece QR con IP de red.
+- **Fase C:** `npx vite --host` → celular escanea QR → toma foto (comprimida) → foto aparece en PC → registro creado exitosamente.
 
 ---
 
@@ -563,6 +563,142 @@ frontend/src/
 - **HTTPS no requerido:** `<input capture>` funciona sobre HTTP plano en todos los navegadores móviles (no usa `getUserMedia`)
 - **Seguridad:** Token de 1 uso + expiración 10 min + eliminado tras uso
 - **`CameraCapture.tsx`:** No se modifica — queda disponible para casos donde el PC tenga cámara
-- **Misma red:** PC y celular deben estar en la misma red local (WiFi)
-- **Puerto backend:** 5192 (hardcodeado en `MobileCapturePage` y `useCameraSession`)
+- **Misma red:** PC y celular deben estar en la misma red local (WiFi) — ver sección Producción para internet
+- **Puerto backend:** 5192. Kestrel en dev escucha en `0.0.0.0:5192` (launchSettings.json) para que el celular alcance el backend
 - **Puerto frontend:** dinámico via `window.location.port` en `useCameraSession`
+- **IP de red:** El backend detecta su IP de red local (`NetworkInterface`) y la devuelve en `POST /photo-sessions` → el frontend la usa en la URL del QR y en la URL de SignalR del celular. El PC siempre conecta SignalR por `localhost:5192`
+- **Compresión de fotos móviles:** `MobileCapturePage.toBase64()` redimensiona a máx 800px y comprime JPEG 0.8 antes de enviar (igual que `CameraCapture`). Sin esto la foto original del celular (~2MB) genera 500 por `max_allowed_packet` de MySQL
+- **QR library:** `qrcode.react@4.2.0` (ESM nativo) — NO usar `react-qr-code` (CJS, incompatible con Vite dev mode, lanza `Element type is invalid: got object`)
+- **CORS SignalR:** Requiere `SetIsOriginAllowed(_ => true)` + `AllowCredentials()`. `AllowAnyOrigin()` es incompatible con `credentials: 'include'` que usa SignalR en negotiate
+
+---
+
+## Producción — plan de migración
+
+> Implementación actual funciona en red local (LAN). Para despliegue cloud se requieren los siguientes cambios.
+
+### P.1 URL del QR — eliminar `networkIp` del backend
+
+En producción la IP interna del servidor no es accesible desde internet. El frontend debe construir la URL del QR usando su propio `window.location.origin`:
+
+**Backend `PhotoSessionsController.cs`:** eliminar la detección de `networkIp`, devolver solo `{ sessionId, token }`.
+
+**Frontend `useCameraSession.ts`:** cambiar:
+
+```ts
+// PRODUCCIÓN — usar el origen del frontend
+const frontendOrigin = window.location.origin; // ej: https://miapp.com
+const url = `${frontendOrigin}/capture/${sessionId}?token=${token}`;
+```
+
+> En desarrollo sin esta lógica, abrir el frontend desde la IP de red (`http://192.168.x.x:5173`) en lugar de `localhost` para que `window.location.origin` sea la IP correcta.
+
+### P.2 Kestrel — detrás de reverse proxy
+
+Revertir `launchSettings.json` → `http://localhost:5192`. El reverse proxy (nginx/IIS/Azure App Gateway) termina TLS y pasa tráfico internamente.
+
+nginx ejemplo:
+
+```nginx
+location /hubs/ {
+    proxy_pass http://localhost:5192;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+}
+```
+
+### P.3 SignalR — escalado horizontal
+
+Con múltiples instancias del backend, el hub del PC puede estar en instancia A y el upload del celular caer en instancia B. Soluciones por orden de complejidad:
+
+**Opción A — Redis Backplane (on-premises / VM):**
+
+```csharp
+// Program.cs
+builder.Services.AddSignalR()
+    .AddStackExchangeRedis("redis:6379");
+```
+
+Instalar NuGet: `Microsoft.AspNetCore.SignalR.StackExchangeRedis`
+
+**Opción B — Azure SignalR Service (cloud):**
+
+```csharp
+builder.Services.AddSignalR()
+    .AddAzureSignalR(Configuration["Azure:SignalR:ConnectionString"]);
+```
+
+Instalar NuGet: `Microsoft.Azure.SignalR`
+No requiere backplane propio — Azure gestiona el routing entre instancias.
+
+**Opción C — Sticky sessions:** Configurar affinity en el load balancer. Simple pero limita el escalado real.
+
+### P.4 `PhotoSessionService` — sesiones distribuidas
+
+El `ConcurrentDictionary` en memoria no sobrevive múltiples instancias. Migrar a Redis con TTL:
+
+```csharp
+// Usando IDistributedCache (Redis)
+public async Task<(string SessionId, string Token)> CreateSessionAsync()
+{
+    var sessionId = Guid.NewGuid().ToString("N");
+    var token = Guid.NewGuid().ToString("N");
+    await _cache.SetStringAsync(
+        $"photo-session:{sessionId}",
+        token,
+        new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) });
+    return (sessionId, token);
+}
+
+public async Task<bool> ValidateAndConsumeAsync(string sessionId, string token)
+{
+    var key = $"photo-session:{sessionId}";
+    var stored = await _cache.GetStringAsync(key);
+    if (stored != token) return false;
+    await _cache.RemoveAsync(key); // uso único
+    return true;
+}
+```
+
+Registrar: `builder.Services.AddStackExchangeRedisCache(o => o.Configuration = "redis:6379")`
+
+### P.5 CORS — restringir orígenes
+
+```csharp
+// appsettings.Production.json
+"AllowedOrigins": ["https://miapp.com", "https://www.miapp.com"]
+
+// Program.cs
+policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!)
+      .AllowAnyMethod()
+      .AllowAnyHeader()
+      .AllowCredentials();
+```
+
+### P.6 Límites de tamaño
+
+```csharp
+// Program.cs — ya cubierto por compresión en cliente, pero defensivo:
+builder.Services.Configure<KestrelServerOptions>(o =>
+    o.Limits.MaxRequestBodySize = 5 * 1024 * 1024); // 5MB
+```
+
+MySQL `my.cnf`:
+
+```ini
+[mysqld]
+max_allowed_packet = 16M
+```
+
+### Resumen de cambios para producción
+
+| Componente              | Dev (actual)                                 | Producción                              |
+| ----------------------- | -------------------------------------------- | --------------------------------------- |
+| URL del QR              | IP local detectada por backend (`networkIp`) | `window.location.origin` del frontend   |
+| Kestrel binding         | `0.0.0.0:5192`                               | `localhost:5192` + reverse proxy        |
+| Protocolo               | HTTP / WS                                    | HTTPS / WSS (automático en SignalR)     |
+| SignalR multi-instancia | N/A (1 instancia)                            | Redis Backplane o Azure SignalR Service |
+| Sesiones foto           | `ConcurrentDictionary` en memoria            | `IDistributedCache` (Redis) con TTL     |
+| CORS                    | `SetIsOriginAllowed(_ => true)`              | `WithOrigins("https://miapp.com")`      |

@@ -50,6 +50,9 @@ const CommonAreasPage = lazy(() =>
     default: m.CommonAreasPage,
   })),
 );
+const MobileCapturePage = lazy(
+  () => import("@/features/capture/MobileCapturePage"),
+);
 
 function PageLoader() {
   return (
@@ -65,6 +68,7 @@ export function AppRouter() {
       <Routes>
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/capture/:sessionId" element={<MobileCapturePage />} />
 
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute />}>

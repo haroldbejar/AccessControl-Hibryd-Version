@@ -1,5 +1,7 @@
 using System.Text;
+using AccessControl.API.Hubs;
 using AccessControl.API.Middleware;
+using AccessControl.API.Services;
 using AccessControl.Application;
 using AccessControl.Infrastructure;
 using AccessControl.Infrastructure.Persistence;
@@ -28,13 +30,20 @@ try
     // ─── Controllers ─────────────────────────────────────────────────────────
     builder.Services.AddControllers();
 
+    // ─── SignalR + Photo Sessions ─────────────────────────────────────────────
+    builder.Services.AddSignalR();
+    builder.Services.AddSingleton<PhotoSessionService>();
+
     // ─── CORS ────────────────────────────────────────────────────────────────
+    // SetIsOriginAllowed(_ => true) + AllowCredentials es requerido para SignalR:
+    // SignalR usa credentials:'include' en negotiate, incompatible con AllowAnyOrigin().
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", policy =>
-            policy.AllowAnyOrigin()
+            policy.SetIsOriginAllowed(_ => true)
                   .AllowAnyMethod()
-                  .AllowAnyHeader());
+                  .AllowAnyHeader()
+                  .AllowCredentials());
     });
 
     // ─── Swagger / OpenAPI ───────────────────────────────────────────────────
@@ -142,6 +151,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    app.MapHub<PhotoHub>("/hubs/photo");
     app.MapHealthChecks("/health");
 
     app.Run();
