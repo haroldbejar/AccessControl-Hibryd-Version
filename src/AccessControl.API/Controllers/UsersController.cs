@@ -1,3 +1,4 @@
+using AccessControl.Application.Features.Users.Commands.ChangePassword;
 using AccessControl.Application.Features.Users.Commands.CreateUser;
 using AccessControl.Application.Features.Users.Commands.DeleteUser;
 using AccessControl.Application.Features.Users.Commands.UpdateUser;
@@ -48,4 +49,17 @@ public sealed class UsersController : BaseController
         var result = await _mediator.Send(new DeleteUserCommand(id, CurrentUserId), cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
+
+    [HttpPatch("{id:int}/change-password")]
+    public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordRequest request, CancellationToken ct)
+    {
+        if (id != CurrentUserId)
+            return Forbid();
+
+        var command = new ChangePasswordCommand(id, request.CurrentPassword, request.NewPassword);
+        var result = await _mediator.Send(command, ct);
+        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+    }
 }
+
+public record ChangePasswordRequest(string CurrentPassword, string NewPassword);

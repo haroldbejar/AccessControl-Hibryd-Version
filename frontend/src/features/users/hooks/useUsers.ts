@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { toast } from "sonner";
 import { userService, roleService } from "../api/userService";
 import type { CreateUserRequest, UpdateUserRequest } from "../types/user.types";
@@ -64,6 +65,27 @@ export function useDeleteUser(onSuccess?: () => void) {
     },
     onError: () => {
       toast.error("Error al eliminar el usuario");
+    },
+  });
+}
+
+export function useChangePassword(onSuccess?: () => void) {
+  return useMutation({
+    mutationFn: ({
+      id,
+      currentPassword,
+      newPassword,
+    }: {
+      id: number;
+      currentPassword: string;
+      newPassword: string;
+    }) => userService.changePassword(id, currentPassword, newPassword),
+    onSuccess: () => {
+      toast.success("Contraseña actualizada correctamente.");
+      onSuccess?.();
+    },
+    onError: (error: AxiosError<string>) => {
+      toast.error(error.response?.data ?? "Error al cambiar la contraseña.");
     },
   });
 }

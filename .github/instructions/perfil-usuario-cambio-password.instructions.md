@@ -31,10 +31,10 @@ Permitir que cualquier usuario autenticado (admin o portero) cambie su propia co
 
 ## Estado de implementación
 
-- [ ] **Fase A** — Backend: Command + Handler + Validator
-- [ ] **Fase B** — Backend: Endpoint en `UsersController`
-- [ ] **Fase C** — Frontend: service + hook
-- [ ] **Fase D** — Frontend: `ChangePasswordDialog` + integración en topbar
+- [x] **Fase A** — Backend: Command + Handler + Validator ✅ Build: 0 errores
+- [x] **Fase B** — Backend: Endpoint en `UsersController` ✅ Build: 0 errores
+- [x] **Fase C** — Frontend: service + hook ✅ Build: 0 errores
+- [x] **Fase D** — Frontend: `ChangePasswordDialog` + integración en topbar ✅ Build: 0 errores
 
 ---
 

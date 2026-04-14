@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -13,10 +14,20 @@ import {
   MapPin,
   Sun,
   Moon,
+  KeyRound,
+  ChevronDown,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/shared/hooks/useTheme";
+import ChangePasswordDialog from "@/features/users/components/ChangePasswordDialog";
 
 const baseNavItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -30,6 +41,7 @@ export function MainLayout() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
 
@@ -104,15 +116,38 @@ export function MainLayout() {
                 <Moon className="h-4 w-4" />
               )}
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Cerrar sesión
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 px-2"
+                >
+                  <span className="text-sm font-medium hidden sm:block">
+                    {user?.name}
+                  </span>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setChangePasswordOpen(true)}>
+                  <KeyRound className="h-4 w-4 mr-2" />
+                  Cambiar contraseña
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ChangePasswordDialog
+              open={changePasswordOpen}
+              onClose={() => setChangePasswordOpen(false)}
+            />
           </div>
         </header>
 
