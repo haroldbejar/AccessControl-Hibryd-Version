@@ -29,6 +29,17 @@ export const userService = {
   delete: async (id: number): Promise<void> => {
     await api.delete(`/users/${id}`);
   },
+
+  changePassword: async (
+    id: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> => {
+    await api.patch(`/users/${id}/change-password`, {
+      currentPassword,
+      newPassword,
+    });
+  },
 };
 
 export const roleService = {
