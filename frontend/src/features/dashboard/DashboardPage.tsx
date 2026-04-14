@@ -61,33 +61,29 @@ export function DashboardPage() {
       title: "Visitas hoy",
       value: visits.length,
       icon: Users,
-      color: "text-[#2563EB]",
-      bg: "bg-[#DBEAFE]",
-      colorHex: "#2563EB",
+      color: "text-[#2563EB] dark:text-blue-400",
+      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
     },
     {
       title: "Visitas activas",
       value: activeVisits.length,
       icon: LogIn,
-      color: "text-[#2563EB]",
-      bg: "bg-[#DBEAFE]",
-      colorHex: "#2563EB",
+      color: "text-[#2563EB] dark:text-blue-400",
+      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
     },
     {
       title: "Paquetes hoy",
       value: packages.length,
       icon: Package,
-      color: "text-[#2563EB]",
-      bg: "bg-[#DBEAFE]",
-      colorHex: "#2563EB",
+      color: "text-[#2563EB] dark:text-blue-400",
+      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
     },
     {
       title: "Paquetes pendientes",
       value: pending.length,
       icon: Clock,
-      color: "text-[#2563EB]",
-      bg: "bg-[#DBEAFE]",
-      colorHex: "#2563EB",
+      color: "text-[#2563EB] dark:text-blue-400",
+      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
     },
   ];
 
@@ -101,19 +97,18 @@ export function DashboardPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {kpis.map(({ title, value, icon: Icon, color, bg, colorHex }) => (
+        {kpis.map(({ title, value, icon: Icon, color, bg }) => (
           <Card
             key={title}
-            className="border-t-2 border-[#2563EB] shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200"
+            className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200"
           >
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#6B7280]">{title}</p>
-                  <p
-                    className="text-4xl font-bold mt-1"
-                    style={{ color: colorHex }}
-                  >
+                  <p className="text-sm text-[#6B7280] dark:text-slate-400">
+                    {title}
+                  </p>
+                  <p className="text-4xl font-bold mt-1 text-[#2563EB] dark:text-blue-400">
                     {value}
                   </p>
                 </div>
@@ -128,9 +123,9 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Visitas recientes del día */}
-        <Card className="border-t-2 border-[#2563EB] shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-          <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] border-b border-[#E5E7EB]">
-            <CardTitle className="text-base font-semibold text-[#2563EB]">
+        <Card className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
+          <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] dark:bg-blue-900/40 border-b border-[#E5E7EB] dark:border-slate-700">
+            <CardTitle className="text-base font-semibold text-[#2563EB] dark:text-blue-400">
               Visitas recientes
             </CardTitle>
           </CardHeader>
@@ -196,9 +191,9 @@ export function DashboardPage() {
         </Card>
 
         {/* Paquetes pendientes */}
-        <Card className="border-t-2 border-[#2563EB] shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-          <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] border-b border-[#E5E7EB]">
-            <CardTitle className="text-base font-semibold text-[#2563EB]">
+        <Card className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
+          <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] dark:bg-blue-900/40 border-b border-[#E5E7EB] dark:border-slate-700">
+            <CardTitle className="text-base font-semibold text-[#2563EB] dark:text-blue-400">
               Paquetes pendientes de entrega
             </CardTitle>
           </CardHeader>
@@ -259,10 +254,10 @@ export function DashboardPage() {
       </div>
 
       {/* Reservas de hoy */}
-      <Card className="border-t-2 border-[#2563EB] shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-        <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] border-b border-[#E5E7EB]">
-          <CardTitle className="text-base font-semibold flex items-center gap-2 text-[#2563EB]">
-            <CalendarDays className="h-4 w-4 text-[#2563EB]" />
+      <Card className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
+        <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] dark:bg-blue-900/40 border-b border-[#E5E7EB] dark:border-slate-700">
+          <CardTitle className="text-base font-semibold flex items-center gap-2 text-[#2563EB] dark:text-blue-400">
+            <CalendarDays className="h-4 w-4 text-[#2563EB] dark:text-blue-400" />
             Reservas de hoy
           </CardTitle>
         </CardHeader>

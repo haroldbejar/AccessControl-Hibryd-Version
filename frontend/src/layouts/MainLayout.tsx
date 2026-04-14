@@ -11,9 +11,12 @@ import {
   FileBarChart2,
   CalendarDays,
   MapPin,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 const baseNavItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -26,6 +29,7 @@ const baseNavItems = [
 export function MainLayout() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
 
@@ -87,15 +91,29 @@ export function MainLayout() {
         {/* Topbar */}
         <header className="h-14 border-b bg-card flex items-center justify-between px-6 shrink-0">
           <div />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="gap-2"
-          >
-            <LogOut className="h-4 w-4" />
-            Cerrar sesión
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              title="Cambiar tema"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Cerrar sesión
+            </Button>
+          </div>
         </header>
 
         {/* Contenido */}
