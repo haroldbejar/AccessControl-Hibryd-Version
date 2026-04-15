@@ -1,6 +1,20 @@
 import { useState, useMemo } from "react";
 import { pdf, PDFViewer } from "@react-pdf/renderer";
-import { FileBarChart2, Download, Loader2, Eye, EyeOff } from "lucide-react";
+import {
+  FileBarChart2,
+  Download,
+  Loader2,
+  Eye,
+  EyeOff,
+  FileSpreadsheet,
+} from "lucide-react";
+import {
+  exportVisitsToExcel,
+  exportVehicleVisitsToExcel,
+  exportPendingPackagesToExcel,
+  exportPackagesHistoryToExcel,
+  exportActivitySummaryToExcel,
+} from "./utils/exportExcel";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/features/auth/store/authStore";
@@ -48,6 +62,7 @@ export function ReportsPage() {
   const [startDate, setStartDate] = useState(firstOfMonth());
   const [endDate, setEndDate] = useState(today());
   const [downloading, setDownloading] = useState(false);
+  const [downloadingExcel, setDownloadingExcel] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
 
   const dateParams = { startDate, endDate };
@@ -78,6 +93,24 @@ export function ReportsPage() {
     r3.isFetching ||
     r4.isFetching ||
     r5.isFetching;
+
+  const handleDownloadExcel = () => {
+    setDownloadingExcel(true);
+    try {
+      if (activeTab === "r1" && r1.data)
+        exportVisitsToExcel(r1.data, startDate, endDate);
+      else if (activeTab === "r2" && r2.data)
+        exportVehicleVisitsToExcel(r2.data, startDate, endDate);
+      else if (activeTab === "r3" && r3.data)
+        exportPendingPackagesToExcel(r3.data);
+      else if (activeTab === "r4" && r4.data)
+        exportPackagesHistoryToExcel(r4.data, startDate, endDate);
+      else if (activeTab === "r5" && r5.data)
+        exportActivitySummaryToExcel(r5.data, startDate, endDate);
+    } finally {
+      setDownloadingExcel(false);
+    }
+  };
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -241,6 +274,19 @@ export function ReportsPage() {
           )}
 
           <div className="flex gap-2 shrink-0">
+            <Button
+              variant="outline"
+              onClick={handleDownloadExcel}
+              disabled={!canDownload || downloadingExcel}
+              className="gap-2"
+            >
+              {downloadingExcel ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="h-4 w-4" />
+              )}
+              {downloadingExcel ? "Generando..." : "Descargar Excel"}
+            </Button>
             <Button
               variant="outline"
               onClick={() => setShowPreview((v) => !v)}
