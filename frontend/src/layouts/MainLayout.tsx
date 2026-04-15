@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/shared/hooks/useTheme";
 import ChangePasswordDialog from "@/features/users/components/ChangePasswordDialog";
+import NotificationBell from "@/shared/components/NotificationBell";
+import { useNotifications } from "@/shared/hooks/useNotifications";
 
 const baseNavItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -44,6 +46,7 @@ export function MainLayout() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
+  const { packageAlerts } = useNotifications();
 
   const adminNavItems = [
     { to: "/destinations", icon: Building2, label: "Destinatarios" },
@@ -83,7 +86,14 @@ export function MainLayout() {
                 }`
               }
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <span className="relative">
+                <Icon className="h-4 w-4 shrink-0" />
+                {to === "/packages" && packageAlerts > 0 && (
+                  <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-destructive text-[10px] text-white flex items-center justify-center font-bold">
+                    {packageAlerts > 9 ? "9+" : packageAlerts}
+                  </span>
+                )}
+              </span>
               {label}
             </NavLink>
           ))}
@@ -116,6 +126,7 @@ export function MainLayout() {
                 <Moon className="h-4 w-4" />
               )}
             </Button>
+            <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
