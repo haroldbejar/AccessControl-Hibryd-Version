@@ -49,72 +49,72 @@
 }
 
 :root {
-    --background: #f4f7fc;
-    --foreground: #1f2937;
+    --background: #f6f8fb;
+    --foreground: #0f172a;
     --card: #ffffff;
-    --card-foreground: #1f2937;
+    --card-foreground: #0f172a;
     --popover: #ffffff;
-    --popover-foreground: #1f2937;
-    --primary: #5b8def;
+    --popover-foreground: #0f172a;
+    --primary: #3b82f6;
     --primary-foreground: #ffffff;
-    --secondary: #eef2fb;
-    --secondary-foreground: #1f2937;
-    --muted: #eef2fb;
-    --muted-foreground: #6b7280;
-    --accent: #a78bfa;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #6366f1;
     --accent-foreground: #ffffff;
     --destructive: #ef4444;
-    --border: #d9e4f5;
-    --input: #d9e4f5;
-    --ring: #5b8def;
-    --chart-1: #5b8def;
-    --chart-2: #a78bfa;
-    --chart-3: #7fbcff;
-    --chart-4: #34d399;
-    --chart-5: #f59e0b;
-    --radius: 0.625rem;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #3b82f6;
+    --chart-1: #3b82f6;
+    --chart-2: #6366f1;
+    --chart-3: #10b981;
+    --chart-4: #f59e0b;
+    --chart-5: #ef4444;
+    --radius: 0.75rem;
     --sidebar: #ffffff;
-    --sidebar-foreground: #1f2937;
-    --sidebar-primary: #5b8def;
+    --sidebar-foreground: #0f172a;
+    --sidebar-primary: #3b82f6;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #eef2fb;
-    --sidebar-accent-foreground: #5b8def;
-    --sidebar-border: #d9e4f5;
-    --sidebar-ring: #5b8def;
+    --sidebar-accent: #f1f5f9;
+    --sidebar-accent-foreground: #3b82f6;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #3b82f6;
 }
 
 .dark {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --card: #1e293b;
-    --card-foreground: #f1f5f9;
-    --popover: #1e293b;
-    --popover-foreground: #f1f5f9;
+    --background: #0b1220;
+    --foreground: #e5e7eb;
+    --card: #111827;
+    --card-foreground: #e5e7eb;
+    --popover: #111827;
+    --popover-foreground: #e5e7eb;
     --primary: #3b82f6;
     --primary-foreground: #ffffff;
-    --secondary: #1e3a5f;
-    --secondary-foreground: #f1f5f9;
-    --muted: #1e293b;
+    --secondary: #1f2937;
+    --secondary-foreground: #e5e7eb;
+    --muted: #1f2937;
     --muted-foreground: #94a3b8;
-    --accent: #a78bfa;
+    --accent: #6366f1;
     --accent-foreground: #ffffff;
     --destructive: #f87171;
-    --border: #334155;
-    --input: #334155;
+    --border: #1f2937;
+    --input: #1f2937;
     --ring: #3b82f6;
     --chart-1: #3b82f6;
-    --chart-2: #a78bfa;
-    --chart-3: #7fbcff;
-    --chart-4: #34d399;
+    --chart-2: #6366f1;
+    --chart-3: #10b981;
+    --chart-4: #f59e0b;
     --chart-5: #fcd34d;
-    --radius: 0.625rem;
-    --sidebar: #1e293b;
-    --sidebar-foreground: #f1f5f9;
+    --radius: 0.75rem;
+    --sidebar: #111827;
+    --sidebar-foreground: #e5e7eb;
     --sidebar-primary: #3b82f6;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #1e3a5f;
+    --sidebar-accent: #1a2a40;
     --sidebar-accent-foreground: #93c5fd;
-    --sidebar-border: #334155;
+    --sidebar-border: #1f2937;
     --sidebar-ring: #3b82f6;
 }
 
@@ -127,5 +127,19 @@
     }
     html {
         @apply font-sans;
+    }
+    /* Card depth global — apunta al data-slot del Card de ShadCN Radix Nova */
+    [data-slot="card"] {
+        box-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.03),
+            0 4px 16px rgba(0, 0, 0, 0.06);
+        transition:
+            box-shadow 0.2s ease,
+            transform 0.15s ease;
+    }
+    .dark [data-slot="card"] {
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(59, 130, 246, 0.07);
     }
 }

@@ -61,29 +61,33 @@ export function DashboardPage() {
       title: "Visitas hoy",
       value: visits.length,
       icon: Users,
-      color: "text-[#2563EB] dark:text-blue-400",
-      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
+      color: "text-blue-500",
+      bg: "bg-blue-500/10",
+      numColor: "text-blue-600 dark:text-blue-400",
     },
     {
       title: "Visitas activas",
       value: activeVisits.length,
       icon: LogIn,
-      color: "text-[#2563EB] dark:text-blue-400",
-      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+      numColor: "text-emerald-600 dark:text-emerald-400",
     },
     {
       title: "Paquetes hoy",
       value: packages.length,
       icon: Package,
-      color: "text-[#2563EB] dark:text-blue-400",
-      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
+      color: "text-violet-500",
+      bg: "bg-violet-500/10",
+      numColor: "text-violet-600 dark:text-violet-400",
     },
     {
       title: "Paquetes pendientes",
       value: pending.length,
       icon: Clock,
-      color: "text-[#2563EB] dark:text-blue-400",
-      bg: "bg-[#DBEAFE] dark:bg-blue-900/40",
+      color: "text-amber-500",
+      bg: "bg-amber-500/10",
+      numColor: "text-amber-600 dark:text-amber-400",
     },
   ];
 
@@ -97,22 +101,20 @@ export function DashboardPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {kpis.map(({ title, value, icon: Icon, color, bg }) => (
+        {kpis.map(({ title, value, icon: Icon, color, bg, numColor }) => (
           <Card
             key={title}
-            className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200"
+            className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
           >
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#6B7280] dark:text-slate-400">
-                    {title}
-                  </p>
-                  <p className="text-4xl font-bold mt-1 text-[#2563EB] dark:text-blue-400">
+                  <p className="text-sm text-muted-foreground">{title}</p>
+                  <p className={`text-4xl font-bold mt-1 ${numColor}`}>
                     {value}
                   </p>
                 </div>
-                <div className={`${bg} p-3 rounded-full`}>
+                <div className={`${bg} p-3 rounded-xl`}>
                   <Icon className={`h-6 w-6 ${color}`} />
                 </div>
               </div>
@@ -123,9 +125,9 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Visitas recientes del día */}
-        <Card className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-          <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] dark:bg-blue-900/40 border-b border-[#E5E7EB] dark:border-slate-700">
-            <CardTitle className="text-base font-semibold text-[#2563EB] dark:text-blue-400">
+        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+          <CardHeader className="px-4 pb-3 border-b">
+            <CardTitle className="text-base font-semibold">
               Visitas recientes
             </CardTitle>
           </CardHeader>
@@ -161,7 +163,7 @@ export function DashboardPage() {
                     {recentVisits.map((v) => (
                       <tr
                         key={v.id}
-                        className="border-b last:border-0 hover:bg-muted/30 transition-colors"
+                        className="border-b last:border-0 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
                       >
                         <td className="px-4 py-2 max-w-35 truncate">
                           {v.fullName}
@@ -191,9 +193,9 @@ export function DashboardPage() {
         </Card>
 
         {/* Paquetes pendientes */}
-        <Card className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-          <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] dark:bg-blue-900/40 border-b border-[#E5E7EB] dark:border-slate-700">
-            <CardTitle className="text-base font-semibold text-[#2563EB] dark:text-blue-400">
+        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+          <CardHeader className="px-4 pb-3 border-b">
+            <CardTitle className="text-base font-semibold">
               Paquetes pendientes de entrega
             </CardTitle>
           </CardHeader>
@@ -229,7 +231,7 @@ export function DashboardPage() {
                     {recentPending.map((p) => (
                       <tr
                         key={p.id}
-                        className="border-b last:border-0 hover:bg-muted/30 transition-colors"
+                        className="border-b last:border-0 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
                       >
                         <td className="px-4 py-2 font-mono text-xs text-muted-foreground">
                           {p.controlNumber}
@@ -254,10 +256,10 @@ export function DashboardPage() {
       </div>
 
       {/* Reservas de hoy */}
-      <Card className="border-t-2 border-[#2563EB] dark:border-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-        <CardHeader className="rounded-t-xl px-4 pb-3 bg-[#DBEAFE] dark:bg-blue-900/40 border-b border-[#E5E7EB] dark:border-slate-700">
-          <CardTitle className="text-base font-semibold flex items-center gap-2 text-[#2563EB] dark:text-blue-400">
-            <CalendarDays className="h-4 w-4 text-[#2563EB] dark:text-blue-400" />
+      <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+        <CardHeader className="px-4 pb-3 border-b">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary" />
             Reservas de hoy
           </CardTitle>
         </CardHeader>
@@ -293,7 +295,7 @@ export function DashboardPage() {
                   {todayReservations.map((r) => (
                     <tr
                       key={r.id}
-                      className="border-b last:border-0 hover:bg-muted/30 transition-colors"
+                      className="border-b last:border-0 hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
                     >
                       <td className="px-4 py-2 max-w-35 truncate">
                         {r.commonAreaName}

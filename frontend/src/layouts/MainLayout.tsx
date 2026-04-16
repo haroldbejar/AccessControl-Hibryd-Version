@@ -65,9 +65,9 @@ export function MainLayout() {
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-card flex flex-col shrink-0">
+      <aside className="w-64 border-r border-sidebar-border bg-sidebar dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#020617] flex flex-col shrink-0">
         {/* Logo */}
-        <div className="flex items-center gap-2 px-6 py-5 border-b">
+        <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
           <Shield className="h-6 w-6 text-primary" />
           <span className="font-semibold text-lg">Access Control</span>
         </div>
@@ -79,10 +79,10 @@ export function MainLayout() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary/10 text-primary dark:bg-primary/15 dark:text-blue-400 font-semibold"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-foreground dark:hover:bg-white/5 dark:hover:text-foreground"
                 }`
               }
             >
@@ -100,7 +100,7 @@ export function MainLayout() {
         </nav>
 
         {/* Info del usuario */}
-        <div className="px-4 py-4 border-t">
+        <div className="px-4 py-4 border-t border-sidebar-border">
           <p className="text-sm font-medium truncate">{user?.name}</p>
           <p className="text-xs text-muted-foreground truncate">
             {user?.roleName}
