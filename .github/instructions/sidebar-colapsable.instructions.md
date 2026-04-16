@@ -36,7 +36,7 @@ Permitir al usuario ocultar las etiquetas de texto del sidebar y ver solo los í
 - [x] **Fase A** — Estado + ancho dinámico del `<aside>` + botón toggle en topbar ✅ Build: 0 errores
 - [x] **Fase B** — Logo colapsado (solo Shield centrado) ✅ Build: 0 errores
 - [x] **Fase C** — Nav items colapsados (solo íconos centrados + tooltips) ✅ Build: 0 errores
-- [ ] **Fase D** — User info colapsado (iniciales en círculo)
+- [x] **Fase D** — User info colapsado (iniciales en círculo) ✅ Build: 0 errores
 - [ ] **Fase E** — Persistencia en localStorage (incluida en Fase A)
 
 ---

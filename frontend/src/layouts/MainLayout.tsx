@@ -60,6 +60,13 @@ export function MainLayout() {
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
   const { packageAlerts } = useNotifications();
+  const initials =
+    user?.name
+      ?.split(" ")
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase() ?? "?";
 
   const adminNavItems = [
     { to: "/destinations", icon: Building2, label: "Destinatarios" },
@@ -128,11 +135,26 @@ export function MainLayout() {
         </nav>
 
         {/* Info del usuario */}
-        <div className="px-4 py-4 border-t border-sidebar-border">
-          <p className="text-sm font-medium truncate">{user?.name}</p>
-          <p className="text-xs text-muted-foreground truncate">
-            {user?.roleName}
-          </p>
+        <div
+          className={`border-t border-sidebar-border transition-all duration-300 ${
+            collapsed ? "flex justify-center px-0 py-4" : "px-4 py-4"
+          }`}
+        >
+          {collapsed ? (
+            <div
+              className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold"
+              title={user?.name}
+            >
+              {initials}
+            </div>
+          ) : (
+            <>
+              <p className="text-sm font-medium truncate">{user?.name}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.roleName}
+              </p>
+            </>
+          )}
         </div>
       </aside>
 
