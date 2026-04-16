@@ -16,6 +16,8 @@ import {
   Moon,
   KeyRound,
   ChevronDown,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -44,6 +46,17 @@ export function MainLayout() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem("access-control-sidebar") === "true";
+  });
+
+  const toggleSidebar = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("access-control-sidebar", String(next));
+      return next;
+    });
+  };
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
   const { packageAlerts } = useNotifications();
@@ -65,7 +78,9 @@ export function MainLayout() {
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-sidebar-border bg-sidebar dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#020617] flex flex-col shrink-0">
+      <aside
+        className={`${collapsed ? "w-16" : "w-64"} border-r border-sidebar-border bg-sidebar dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#020617] flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden`}
+      >
         {/* Logo */}
         <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
           <Shield className="h-6 w-6 text-primary" />
@@ -112,7 +127,18 @@ export function MainLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
         <header className="h-14 border-b bg-card flex items-center justify-between px-6 shrink-0">
-          <div />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            title={collapsed ? "Expandir menú" : "Colapsar menú"}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
+          </Button>
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
