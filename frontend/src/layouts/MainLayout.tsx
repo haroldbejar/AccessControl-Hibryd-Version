@@ -16,6 +16,8 @@ import {
   Moon,
   KeyRound,
   ChevronDown,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -44,9 +46,27 @@ export function MainLayout() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem("access-control-sidebar") === "true";
+  });
+
+  const toggleSidebar = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("access-control-sidebar", String(next));
+      return next;
+    });
+  };
 
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
   const { packageAlerts } = useNotifications();
+  const initials =
+    user?.name
+      ?.split(" ")
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase() ?? "?";
 
   const adminNavItems = [
     { to: "/destinations", icon: Building2, label: "Destinatarios" },
@@ -65,11 +85,21 @@ export function MainLayout() {
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-sidebar-border bg-sidebar dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#020617] flex flex-col shrink-0">
+      <aside
+        className={`${collapsed ? "w-16" : "w-64"} border-r border-sidebar-border bg-sidebar dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#020617] flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden`}
+      >
         {/* Logo */}
-        <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
-          <Shield className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-lg">Access Control</span>
+        <div
+          className={`flex items-center border-b border-sidebar-border transition-all duration-300 ${
+            collapsed ? "justify-center px-0 py-5" : "gap-2 px-6 py-5"
+          }`}
+        >
+          <Shield className="h-6 w-6 text-primary shrink-0" />
+          {!collapsed && (
+            <span className="font-semibold text-lg whitespace-nowrap overflow-hidden">
+              Access Control
+            </span>
+          )}
         </div>
 
         {/* Navegación */}
@@ -78,8 +108,13 @@ export function MainLayout() {
             <NavLink
               key={to}
               to={to}
+              title={collapsed ? label : undefined}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
+                `flex items-center rounded-md text-sm font-medium transition-all duration-150 ${
+                  collapsed
+                    ? "justify-center px-0 py-2 w-full"
+                    : "gap-3 px-3 py-2"
+                } ${
                   isActive
                     ? "bg-primary/10 text-primary dark:bg-primary/15 dark:text-blue-400 font-semibold"
                     : "text-muted-foreground hover:bg-primary/5 hover:text-foreground dark:hover:bg-white/5 dark:hover:text-foreground"
@@ -94,17 +129,32 @@ export function MainLayout() {
                   </span>
                 )}
               </span>
-              {label}
+              {!collapsed && label}
             </NavLink>
           ))}
         </nav>
 
         {/* Info del usuario */}
-        <div className="px-4 py-4 border-t border-sidebar-border">
-          <p className="text-sm font-medium truncate">{user?.name}</p>
-          <p className="text-xs text-muted-foreground truncate">
-            {user?.roleName}
-          </p>
+        <div
+          className={`border-t border-sidebar-border transition-all duration-300 ${
+            collapsed ? "flex justify-center px-0 py-4" : "px-4 py-4"
+          }`}
+        >
+          {collapsed ? (
+            <div
+              className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold"
+              title={user?.name}
+            >
+              {initials}
+            </div>
+          ) : (
+            <>
+              <p className="text-sm font-medium truncate">{user?.name}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.roleName}
+              </p>
+            </>
+          )}
         </div>
       </aside>
 
@@ -112,7 +162,18 @@ export function MainLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
         <header className="h-14 border-b bg-card flex items-center justify-between px-6 shrink-0">
-          <div />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            title={collapsed ? "Expandir menú" : "Colapsar menú"}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
+          </Button>
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
