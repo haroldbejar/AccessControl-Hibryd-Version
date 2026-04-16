@@ -82,9 +82,17 @@ export function MainLayout() {
         className={`${collapsed ? "w-16" : "w-64"} border-r border-sidebar-border bg-sidebar dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#020617] flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden`}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
-          <Shield className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-lg">Access Control</span>
+        <div
+          className={`flex items-center border-b border-sidebar-border transition-all duration-300 ${
+            collapsed ? "justify-center px-0 py-5" : "gap-2 px-6 py-5"
+          }`}
+        >
+          <Shield className="h-6 w-6 text-primary shrink-0" />
+          {!collapsed && (
+            <span className="font-semibold text-lg whitespace-nowrap overflow-hidden">
+              Access Control
+            </span>
+          )}
         </div>
 
         {/* Navegación */}
