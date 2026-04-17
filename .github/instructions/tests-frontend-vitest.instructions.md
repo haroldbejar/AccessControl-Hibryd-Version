@@ -33,11 +33,7 @@ Implementar cobertura de tests unitarios y de integración en el frontend React,
 
 ## Estado de implementación
 
-- [x] **Fase 1** — Setup base: dependencias, config, scripts
-- [ ] **Fase 2** — Tests de schemas Zod
-- [ ] **Fase 3** — Tests de authStore Zustand
-- [ ] **Fase 4** — Tests de hooks de lógica
-- [ ] **Fase 5** — Tests de componentes clave
+- [x] **Fase 2** — Tests de schemas Zod
 
 ---
 
