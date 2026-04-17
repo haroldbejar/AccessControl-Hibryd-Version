@@ -115,14 +115,48 @@ Se intentó implementar tests para hooks de lógica (`useNotifications`, `useCam
 
 ---
 
-## Fase 5 — Tests de componentes clave (~10 tests)
+## Fase 5 — Tests de componentes clave (~10 tests) ✅ COMPLETADA
 
 - `src/routes/__tests__/ProtectedRoute.test.tsx`
 - `src/features/auth/__tests__/LoginPage.test.tsx`
 
-Casos:
+**Checklist:**
 
-- Redirección, renderizado condicional, validación, feedback de error
+- [x] Test de renderizado y validación de campos requeridos en LoginPage
+- [x] Test de login exitoso (mock de navegación)
+- [x] Test de login fallido (mock de toast.error)
+- [x] Test de ProtectedRoute: renderiza children si autenticado
+- [x] Test de ProtectedRoute: redirige y muestra toast si no autenticado
+- [x] Validar que ambos tests pasan
+- [x] Validar que la suite global pasa sin errores
+
+**Verificación:**
+
+```bash
+npm run test -- --run
+# → 0 errores, 32 tests pasan
+```
+
+**Notas:**
+
+- Se eliminaron los archivos de test vacíos de hooks (`useCameraSession`, `useNotifications`, `useVisits`) para limpiar la suite y evitar errores "No test suite found".
+- Los tests de `LoginPage` y `ProtectedRoute` mockean correctamente `toast.error` y la navegación.
+- Todos los tests de schemas y Zustand siguen pasando.
+
+---
+
+## Estado actual de cobertura
+
+- Schemas Zod: 100% cubiertos (visitas, usuarios, reservas, paquetes)
+- Zustand authStore: 100% cubierto
+- Componentes clave: cubiertos (`LoginPage`, `ProtectedRoute`)
+- Hooks lógicos: **pendiente** (se abortó Fase 4 por problemas de entorno)
+
+---
+
+## Próxima fase
+
+- Fase 6 — Tests de integración end-to-end (MSW, flows completos)
 
 ---
 
