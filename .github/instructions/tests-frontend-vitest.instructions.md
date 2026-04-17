@@ -33,7 +33,7 @@ Implementar cobertura de tests unitarios y de integración en el frontend React,
 
 ## Estado de implementación
 
-- [ ] **Fase 1** — Setup base: dependencias, config, scripts
+- [x] **Fase 1** — Setup base: dependencias, config, scripts
 - [ ] **Fase 2** — Tests de schemas Zod
 - [ ] **Fase 3** — Tests de authStore Zustand
 - [ ] **Fase 4** — Tests de hooks de lógica
@@ -41,15 +41,43 @@ Implementar cobertura de tests unitarios y de integración en el frontend React,
 
 ---
 
-## Fase 1 — Setup base
+## Fase 1 — Setup base ✅ COMPLETADA
 
-1. Instalar devDependencies:
+1. **Dependencias instaladas:**
     - `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`, `jsdom`, `msw@2`, `@vitest/coverage-v8`
-2. Crear `frontend/vitest.config.ts` — extiende vite.config, env jsdom, alias @, globals true, setupFiles
-3. Crear `frontend/src/test/setup.ts` — importar `@testing-library/jest-dom`
-4. Crear `frontend/src/test/utils.tsx` — `renderWithProviders` con QueryClient + BrowserRouter
-5. Editar `frontend/package.json` — scripts: `test`, `test:watch`, `test:coverage`
-6. Editar `frontend/tsconfig.app.json` — añadir `vitest/globals` a types
+    - Instalación ejecutada con:
+        ```bash
+        npm install --save-dev vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom msw@2 @vitest/coverage-v8 --legacy-peer-deps
+        ```
+2. **Config creada:**
+    - `frontend/vitest.config.ts` (env jsdom, alias @, setupFiles, cobertura)
+    - `frontend/src/test/setup.ts` (importa jest-dom)
+    - `frontend/src/test/utils.tsx` (render con QueryClient + BrowserRouter)
+3. **Scripts agregados a `package.json`:**
+    - `"test": "vitest run --reporter=verbose"`
+    - `"test:watch": "vitest --watch"`
+    - `"test:coverage": "vitest run --coverage"`
+4. **Validación:**
+    - `npm run test` ejecuta Vitest correctamente (sale con código 1 porque no hay tests aún, esperado)
+    - No hay errores de compilación ni conflictos
+
+**Checklist:**
+
+- [x] Dependencias instaladas
+- [x] Configuración Vitest creada
+- [x] Scripts agregados
+- [x] Build sin errores
+- [x] Listo para Fase 2
+    - `npm run test` ejecuta Vitest correctamente (sale con código 1 porque no hay tests aún)
+    - No hay errores de compilación ni conflictos
+
+**Estado:**
+
+- [x] Dependencias instaladas
+- [x] Configuración Vitest creada
+- [x] Scripts agregados
+- [x] Build sin errores
+- [x] Listo para Fase 2
 
 ---
 
