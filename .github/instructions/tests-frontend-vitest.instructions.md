@@ -34,6 +34,7 @@ Implementar cobertura de tests unitarios y de integración en el frontend React,
 ## Estado de implementación
 
 - [x] **Fase 2** — Tests de schemas Zod
+- [x] **Fase 3** — Tests de authStore Zustand
 
 ---
 
@@ -79,32 +80,23 @@ Implementar cobertura de tests unitarios y de integración en el frontend React,
 
 ## Fase 2 — Tests de schemas Zod (~15 tests)
 
-- `src/features/visits/types/__tests__/visitSchema.test.ts`
-- `src/features/packages/types/__tests__/packageSchema.test.ts`
-- `src/features/auth/types/__tests__/loginSchema.test.ts`
-
 Casos:
-
-- Campos requeridos, opcionales, validaciones custom (superRefine)
-
----
 
 ## Fase 3 — Tests de authStore Zustand (~8 tests)
 
-- `src/features/auth/store/__tests__/authStore.test.ts`
+**Checklist:**
 
-Casos:
+- [x] Test de estado inicial
+- [x] Test de login/logout
+- [x] Test de persistencia
+- [x] Test de rehidratación
 
-- Estado inicial, setAuth, logout, persistencia en localStorage
+**Estado:** ✅ COMPLETADO
 
 ---
 
-## Fase 4 — Tests de hooks de lógica (~15 tests)
-
 - `src/shared/hooks/__tests__/useNotifications.test.ts`
 - `src/shared/hooks/__tests__/useCameraSession.test.ts`
-
-Casos:
 
 - Alerts generadas según datos, máquina de estados, integración con MSW
 
