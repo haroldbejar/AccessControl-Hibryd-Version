@@ -102,6 +102,19 @@ Casos:
 
 ---
 
+## Fase 4 — Tests de hooks de lógica (ABORTADA)
+
+Se intentó implementar tests para hooks de lógica (`useNotifications`, `useCameraSession`, `useVisits`), pero se eliminaron por problemas de importación/mocks y bajo valor de cobertura real en este contexto. No hay tests activos para estos hooks.
+
+**Checklist:**
+
+- [ ] Tests de hooks de lógica implementados
+- [x] Tests eliminados por decisión técnica (16/04/2026)
+
+**Estado:** ❌ ABORTADA — No se incluyen tests de hooks de lógica en la suite.
+
+---
+
 ## Fase 5 — Tests de componentes clave (~10 tests)
 
 - `src/routes/__tests__/ProtectedRoute.test.tsx`
@@ -142,7 +155,7 @@ frontend/tsconfig.app.json  ← types: vitest/globals
 
 ## Verificación final
 
-1. `npm run test` → todos los tests pasan (~48 tests en total)
+1. `npm run test` → todos los tests pasan (27 tests activos, hooks de lógica excluidos)
 2. `npm run test:coverage` → cobertura visible en terminal
 3. `npm run build` → sin errores (tests no afectan build)
 
