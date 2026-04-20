@@ -331,7 +331,6 @@ export function CreateVisitDialog({ open, onClose }: Props) {
             <PhotoCapture
               key={`photo1-${open}`}
               label="Foto del visitante"
-              required
               onCapture={(b64) =>
                 setValue("photo", b64 ?? "", { shouldValidate: true })
               }

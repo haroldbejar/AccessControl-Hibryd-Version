@@ -1,22 +1,20 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeSVG } from "qrcode.react";
-import { CameraCapture } from "./CameraCapture";
+
 import { useCameraSession } from "@/shared/hooks/useCameraSession";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface Props {
   label: string;
-  required?: boolean;
   onCapture: (base64: string | null) => void;
 }
 
-export function PhotoCapture({ label, required, onCapture }: Props) {
-  // Estado local para el preview de la foto capturada (PC o móvil)
+export function PhotoCapture({ label, onCapture }: Props) {
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
-  // Maneja la recepción de la foto desde PC o móvil
   const handlePhoto = useCallback(
     (photo: string | null) => {
       setCapturedPhoto(photo);
@@ -25,13 +23,23 @@ export function PhotoCapture({ label, required, onCapture }: Props) {
     [onCapture],
   );
 
+  const { state, sessionUrl, generateSession, cancelSession } =
+    useCameraSession(handlePhoto);
+
+  useEffect(() => {
+    if (state === "received" && capturedPhoto) {
+      setLoadingPreview(true);
+      const timeout = setTimeout(() => {
+        setLoadingPreview(false);
+      }, 700);
+      return () => clearTimeout(timeout);
+    }
+  }, [state, capturedPhoto]);
+
   const handleRetake = useCallback(() => {
     setCapturedPhoto(null);
     onCapture(null);
   }, [onCapture]);
-
-  const { state, sessionUrl, generateSession, cancelSession } =
-    useCameraSession(handlePhoto);
 
   return (
     <Tabs defaultValue="pc">
@@ -43,37 +51,30 @@ export function PhotoCapture({ label, required, onCapture }: Props) {
       <TabsContent value="pc">
         {/* Preview si ya hay foto capturada */}
         {capturedPhoto ? (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 animate-fade-in">
             <img
               src={`data:image/jpeg;base64,${capturedPhoto}`}
               alt={label}
               className="h-44 w-full object-cover rounded-md border"
             />
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={handleRetake}
-            >
-              Retomar
-            </Button>
           </div>
-        ) : (
-          <CameraCapture
-            label={label}
-            required={required}
-            onCapture={handlePhoto}
-          />
-        )}
+        ) : null}
       </TabsContent>
 
       <TabsContent
         value="mobile"
         className="flex flex-col items-center gap-3 py-2"
       >
-        {/* Preview si ya hay foto capturada */}
-        {capturedPhoto ? (
-          <div className="flex flex-col items-center gap-2">
+        {/* Fase 2: Spinner de transición al recibir foto móvil */}
+        {loadingPreview ? (
+          <div className="flex flex-col items-center gap-2 animate-fade-in">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">
+              Procesando imagen...
+            </p>
+          </div>
+        ) : capturedPhoto ? (
+          <div className="flex flex-col items-center gap-2 animate-fade-in">
             <p className="text-sm text-green-600 font-medium">
               ✓ Foto recibida
             </p>
