@@ -4,11 +4,7 @@ import { LoginPage } from "../LoginPage";
 import { BrowserRouter } from "react-router-dom";
 import * as authStore from "../store/authStore";
 import * as authService from "../api/authService";
-vi.mock("sonner", () => {
-  const toast = vi.fn();
-  toast.error = vi.fn();
-  return { toast };
-});
+
 import * as sonner from "sonner";
 
 function renderLogin() {
@@ -23,6 +19,7 @@ describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    vi.spyOn(sonner.toast, "error").mockImplementation(() => "mock-toast-id");
   });
 
   it("renderiza el formulario y valida campos requeridos", async () => {
@@ -40,7 +37,7 @@ describe("LoginPage", () => {
     const loginMock = vi
       .spyOn(authStore, "useAuthStore")
       .mockReturnValue(() => {});
-    const navigateMock = vi.fn();
+    // const navigateMock = vi.fn(); // Eliminado: variable no usada
     vi.spyOn(authService, "authService", "get").mockReturnValue({
       login: vi.fn().mockResolvedValue({
         userId: 1,
