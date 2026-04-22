@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { differenceInDays, parseISO, format } from "date-fns";
-import { packageService } from "@/features/packages/api/packageService";
 import { reservationService } from "@/features/reservations/api/reservationService";
 import { ReservationStatusEnum } from "@/features/reservations/types/reservation.types";
 import { useAuthStore } from "@/features/auth/store/authStore";
+import { usePendingPackages } from "@/features/packages/hooks/usePackages";
 import type { AppAlert, AlertType } from "@/shared/types/notification.types";
 
 const PACKAGE_OVERDUE_DAYS = 3;
@@ -16,9 +16,8 @@ export function useNotifications() {
   const isAdmin = user?.roleName?.toLowerCase().includes("admin") ?? false;
   const todayDate = format(new Date(), "yyyy-MM-dd");
 
-  const packagesQuery = useQuery({
-    queryKey: ["notifications", "pending-packages"],
-    queryFn: () => packageService.getPending(),
+  // Usar el mismo hook que el dashboard/badge, pero con polling
+  const packagesQuery = usePendingPackages({
     refetchInterval: POLL_INTERVAL,
   });
 
@@ -66,7 +65,7 @@ export function useNotifications() {
         }
       }
 
-      // Pendientes sin confirmar — solo admin
+      // Pendientes sin confirmar (solo admin)
       if (isAdmin && res.status === ReservationStatusEnum.Pending) {
         result.push({
           id: `res-unconf-${res.id}`,
@@ -77,6 +76,7 @@ export function useNotifications() {
       }
     }
 
+    // Ordenar: primero package-overdue, luego reservation-upcoming, luego unconfirmed
     const order: Record<AlertType, number> = {
       "package-overdue": 0,
       "reservation-upcoming": 1,
