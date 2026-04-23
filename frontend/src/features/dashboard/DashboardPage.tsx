@@ -141,7 +141,7 @@ export function DashboardPage() {
                 Sin visitas registradas hoy.
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto max-h-72 overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/40">
@@ -209,7 +209,7 @@ export function DashboardPage() {
                 No hay paquetes pendientes.
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto max-h-72 overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/40">
