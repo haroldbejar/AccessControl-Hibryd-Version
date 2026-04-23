@@ -141,10 +141,13 @@ export function DashboardPage() {
                 Sin visitas registradas hoy.
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div
+                className="overflow-x-auto max-h-72 overflow-y-auto px-2 md:px-0 custom-scrollbar"
+                style={{ maxHeight: "18rem", minHeight: "6rem" }}
+              >
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/40">
+                  <thead className="sticky top-0 z-10 bg-muted/60 backdrop-blur">
+                    <tr className="border-b">
                       <th className="px-4 py-2 text-left font-medium text-muted-foreground">
                         Visitante
                       </th>
@@ -209,10 +212,13 @@ export function DashboardPage() {
                 No hay paquetes pendientes.
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div
+                className="overflow-x-auto max-h-72 overflow-y-auto px-2 md:px-0 custom-scrollbar"
+                style={{ maxHeight: "18rem", minHeight: "6rem" }}
+              >
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/40">
+                  <thead className="sticky top-0 z-10 bg-muted/60 backdrop-blur">
+                    <tr className="border-b">
                       <th className="px-4 py-2 text-left font-medium text-muted-foreground">
                         Control
                       </th>

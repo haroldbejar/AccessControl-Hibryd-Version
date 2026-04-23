@@ -1,3 +1,20 @@
+/* Scrollbar custom para dashboard cards scrollables */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--muted);
+}
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-radius: 6px;
+}
 /* Animación fade-in para preview de foto (fase 2 PhotoCapture) */
 .animate-fade-in {
     animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
