@@ -23,7 +23,9 @@ const alertIconColor: Record<AlertType, string> = {
   "reservation-unconfirmed": "text-yellow-500",
 };
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import DeliverPackageFromAlertDialog from "@/features/packages/components/DeliverPackageFromAlertDialog";
+import type { PackageResponse } from "@/features/packages/types/package.types";
 
 function AlertItem({
   alert,
@@ -67,17 +69,49 @@ function AlertItem({
 
 export default function NotificationBell() {
   const { alerts, totalCount } = useNotifications();
-
-  // Simulación de loading por paquete (fase 1: solo UI, no acción real)
+  // Estado: id del paquete cuyo dialog está abierto
+  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  // Handler para click en "Entregar" (abrirá dialog en fase 2)
+  // Buscar el paquete y días pendiente según el id de alerta
+  const dialogData = useMemo(() => {
+    if (!openDialogId) return null;
+    const alert = alerts.find(
+      (a) => a.id === openDialogId && a.type === "package-overdue",
+    );
+    if (!alert) return null;
+    // El id es "pkg-<id>"
+    const pkgId = Number(alert.id.replace("pkg-", ""));
+    // Buscar el paquete en el propio alert (si se añade en el futuro) o pedirlo por prop
+    // Por ahora, el alert no trae el paquete completo, así que no se puede abrir el dialog real
+    // Fase 2: solo UI, se puede pasar datos dummy
+    return {
+      pkg: {
+        id: pkgId,
+        controlNumber: "?",
+        senderName: "?",
+        destinationName: "?",
+      } as PackageResponse,
+      daysOverdue: alert.daysOverdue ?? 0,
+    };
+  }, [openDialogId, alerts]);
+
+  // Handler para click en "Entregar"
   const handleDeliver = (alertId: string) => {
-    setLoadingId(alertId);
-    // Simulación de loading breve (solo UI)
-    setTimeout(() => {
-      setLoadingId(null);
-    }, 1200);
+    setOpenDialogId(alertId);
+  };
+
+  // Handler para confirmar entrega (dummy)
+  const handleDialogDeliver = async (_deliveredTo: string) => {
+    setLoadingId(openDialogId);
+    // Simulación de entrega
+    await new Promise((res) => setTimeout(res, 1200));
+    setLoadingId(null);
+    setOpenDialogId(null);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialogId(null);
   };
 
   return (
@@ -133,6 +167,17 @@ export default function NotificationBell() {
               />
             ))}
           </div>
+        )}
+        {/* Dialogo de entrega (solo uno a la vez) */}
+        {dialogData && (
+          <DeliverPackageFromAlertDialog
+            open={!!openDialogId}
+            onClose={handleDialogClose}
+            pkg={dialogData.pkg}
+            daysOverdue={dialogData.daysOverdue}
+            onDeliver={handleDialogDeliver}
+            loading={loadingId === openDialogId}
+          />
         )}
       </DropdownMenuContent>
     </DropdownMenu>
