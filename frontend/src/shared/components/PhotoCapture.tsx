@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeSVG } from "qrcode.react";
+import { CameraCapture } from "./CameraCapture";
 
 import { useCameraSession } from "@/shared/hooks/useCameraSession";
 import { Loader2 } from "lucide-react";
@@ -49,7 +50,6 @@ export function PhotoCapture({ label, onCapture }: Props) {
       </TabsList>
 
       <TabsContent value="pc">
-        {/* Preview si ya hay foto capturada */}
         {capturedPhoto ? (
           <div className="flex flex-col items-center gap-2 animate-fade-in">
             <img
@@ -57,8 +57,18 @@ export function PhotoCapture({ label, onCapture }: Props) {
               alt={label}
               className="h-44 w-full object-cover rounded-md border"
             />
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={handleRetake}
+            >
+              Retomar
+            </Button>
           </div>
-        ) : null}
+        ) : (
+          <CameraCapture label={label} onCapture={handlePhoto} />
+        )}
       </TabsContent>
 
       <TabsContent

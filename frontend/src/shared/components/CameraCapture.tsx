@@ -35,6 +35,9 @@ export function CameraCapture({
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [captured, setCaptured] = useState<string | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [streamError, setStreamError] = useState<string | null>(null);
+  const [streamAttempt, setStreamAttempt] = useState(0);
 
   // Solicitar permiso y enumerar cámaras al montar
   useEffect(() => {
@@ -42,6 +45,11 @@ export function CameraCapture({
 
     async function init() {
       try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          setPermissionDenied(true);
+          return;
+        }
+
         // Solicita permiso primero para obtener labels reales
         const tempStream = await navigator.mediaDevices.getUserMedia({
           video: true,
@@ -59,10 +67,18 @@ export function CameraCapture({
           }));
 
         setDevices(videoInputs);
-        if (videoInputs.length > 0)
+        if (videoInputs.length > 0) {
           setSelectedDeviceId(videoInputs[0].deviceId);
+          setStreamError(null);
+        } else {
+          setStreamError(
+            "No se detectaron cámaras disponibles en este equipo.",
+          );
+        }
       } catch {
         if (!cancelled) setPermissionDenied(true);
+      } finally {
+        if (!cancelled) setIsInitializing(false);
       }
     }
 
@@ -84,6 +100,7 @@ export function CameraCapture({
       streamRef.current = null;
 
       try {
+        setStreamError(null);
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             deviceId: { exact: selectedDeviceId },
@@ -100,7 +117,9 @@ export function CameraCapture({
         streamRef.current = stream;
         if (videoRef.current) videoRef.current.srcObject = stream;
       } catch {
-        // Dispositivo no disponible; ignorar silenciosamente
+        setStreamError(
+          "No se pudo iniciar la cámara seleccionada. Verifica si está siendo usada por otra aplicación.",
+        );
       }
     }
 
@@ -111,7 +130,7 @@ export function CameraCapture({
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     };
-  }, [selectedDeviceId, captured]);
+  }, [selectedDeviceId, captured, streamAttempt]);
 
   const handleCapture = () => {
     const video = videoRef.current;
@@ -152,6 +171,34 @@ export function CameraCapture({
     );
   }
 
+  if (isInitializing) {
+    return (
+      <div className="space-y-1">
+        <Label>
+          {label}
+          {required && <span className="ml-1 text-destructive">*</span>}
+        </Label>
+        <p className="rounded-md border px-3 py-2 text-xs text-muted-foreground">
+          Inicializando cámara...
+        </p>
+      </div>
+    );
+  }
+
+  if (devices.length === 0) {
+    return (
+      <div className="space-y-1">
+        <Label>
+          {label}
+          {required && <span className="ml-1 text-destructive">*</span>}
+        </Label>
+        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          No se detectaron cámaras disponibles en este equipo.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <Label>
@@ -175,6 +222,24 @@ export function CameraCapture({
         </Select>
       )}
 
+      {streamError && !captured && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          <p>{streamError}</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="mt-1 h-6 px-2 text-xs"
+            onClick={() => {
+              setStreamError(null);
+              setStreamAttempt((n) => n + 1);
+            }}
+          >
+            Reintentar cámara
+          </Button>
+        </div>
+      )}
+
       {/* Área de captura */}
       <div className="relative overflow-hidden rounded-md border border-border bg-muted">
         {!captured ? (
@@ -191,7 +256,7 @@ export function CameraCapture({
               size="sm"
               className="absolute bottom-2 left-1/2 -translate-x-1/2"
               onClick={handleCapture}
-              disabled={!selectedDeviceId}
+              disabled={!selectedDeviceId || !!streamError}
             >
               <Camera className="mr-1 h-3 w-3" />
               Capturar

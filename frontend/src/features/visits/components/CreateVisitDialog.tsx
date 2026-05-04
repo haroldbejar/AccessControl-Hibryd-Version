@@ -329,7 +329,6 @@ export function CreateVisitDialog({ open, onClose }: Props) {
           <div className="space-y-3 border-t border-border pt-3">
             <p className="text-sm font-medium">Fotografías</p>
             <PhotoCapture
-              key={`photo1-${open}`}
               label="Foto del visitante"
               onCapture={(b64) =>
                 setValue("photo", b64 ?? "", { shouldValidate: true })
@@ -339,7 +338,6 @@ export function CreateVisitDialog({ open, onClose }: Props) {
               <p className="text-xs text-destructive">{errors.photo.message}</p>
             )}
             <PhotoCapture
-              key={`photo2-${open}`}
               label="Foto adicional (opcional)"
               onCapture={(b64) => setValue("photo2", b64 ?? "")}
             />
