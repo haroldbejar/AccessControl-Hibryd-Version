@@ -23,25 +23,73 @@ const alertIconColor: Record<AlertType, string> = {
   "reservation-unconfirmed": "text-yellow-500",
 };
 
-function AlertItem({ alert }: { alert: AppAlert }) {
+import { useState } from "react";
+import DeliverPackageFromAlertDialog from "@/features/packages/components/DeliverPackageFromAlertDialog";
+import { useDeliverPackage } from "@/features/packages/hooks/usePackages";
+import type { PackageResponse } from "@/features/packages/types/package.types";
+
+function AlertItem({
+  alert,
+  onDeliver,
+  delivering,
+}: {
+  alert: AppAlert;
+  onDeliver?: () => void;
+  delivering?: boolean;
+}) {
   const Icon = alertIcon[alert.type];
   return (
     <div className="flex items-start gap-3 px-3 py-2 hover:bg-muted/50 rounded-sm">
       <Icon
         className={`h-4 w-4 mt-0.5 shrink-0 ${alertIconColor[alert.type]}`}
       />
-      <div className="flex flex-col gap-0.5 min-w-0">
+      <div className="flex flex-col gap-0.5 min-w-0 flex-1">
         <span className="text-sm font-medium leading-tight">{alert.title}</span>
         <span className="text-xs text-muted-foreground leading-tight truncate">
           {alert.description}
         </span>
       </div>
+      {/* Solo para paquetes vencidos */}
+      {alert.type === "package-overdue" && onDeliver && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="ml-2"
+          onClick={onDeliver}
+          disabled={!!delivering}
+        >
+          {delivering ? (
+            <span className="animate-spin mr-1 w-3 h-3 border-2 border-primary border-t-transparent rounded-full inline-block" />
+          ) : null}
+          Entregar
+        </Button>
+      )}
     </div>
   );
 }
 
 export default function NotificationBell() {
   const { alerts, totalCount } = useNotifications();
+  // Estado: paquete seleccionado (objeto completo)
+  const [openDialogPkg, setOpenDialogPkg] = useState<PackageResponse | null>(
+    null,
+  );
+  const [openDialogDays, setOpenDialogDays] = useState<number>(0);
+
+  // Hook real de entrega
+  const deliverMutation = useDeliverPackage();
+
+  // Handler para click en "Entregar"
+  const handleDeliver = (alert: AppAlert) => {
+    if (alert.type === "package-overdue" && alert.package) {
+      setOpenDialogPkg(alert.package);
+      setOpenDialogDays(alert.daysOverdue ?? 0);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialogPkg(null);
+  };
 
   return (
     <DropdownMenu>
@@ -84,9 +132,31 @@ export default function NotificationBell() {
         ) : (
           <div className="py-1">
             {alerts.map((alert) => (
-              <AlertItem key={alert.id} alert={alert} />
+              <AlertItem
+                key={alert.id}
+                alert={alert}
+                onDeliver={
+                  alert.type === "package-overdue"
+                    ? () => handleDeliver(alert)
+                    : undefined
+                }
+                delivering={
+                  alert.type === "package-overdue" &&
+                  deliverMutation.isPending &&
+                  openDialogPkg?.id === alert.package?.id
+                }
+              />
             ))}
           </div>
+        )}
+        {/* Dialogo de entrega (solo uno a la vez) */}
+        {openDialogPkg && (
+          <DeliverPackageFromAlertDialog
+            open={!!openDialogPkg}
+            onClose={handleDialogClose}
+            pkg={openDialogPkg}
+            daysOverdue={openDialogDays}
+          />
         )}
       </DropdownMenuContent>
     </DropdownMenu>

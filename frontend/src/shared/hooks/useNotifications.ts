@@ -42,6 +42,7 @@ export function useNotifications() {
           title: "Paquete sin entregar",
           description: `Control #${pkg.controlNumber} — ${days} día${days !== 1 ? "s" : ""} pendiente`,
           daysOverdue: days,
+          package: pkg, // Incluir el objeto completo
         });
       }
     }
