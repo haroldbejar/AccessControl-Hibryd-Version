@@ -30,6 +30,17 @@ public sealed class RepresentativeConfiguration : IEntityTypeConfiguration<Repre
         builder.Property(r => r.Color).HasMaxLength(30);
         builder.Property(r => r.Plate).HasMaxLength(20);
 
+        // Tipo de representante y contrato
+        builder.Property(r => r.RepresentativeType)
+            .HasConversion<int>()
+            .HasColumnName("RepresentativeType")
+            .HasDefaultValue(RepresentativeTypeEnum.Owner);
+
+        builder.Property(r => r.ContractEndDate)
+            .HasColumnType("date")
+            .HasColumnName("ContractEndDate")
+            .IsRequired(false);
+
         // Auditoría
         builder.Property(r => r.CreatedDate).IsRequired();
         builder.Property(r => r.Eliminated).HasDefaultValue(false);

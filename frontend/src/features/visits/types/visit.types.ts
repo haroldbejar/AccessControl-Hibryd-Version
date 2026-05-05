@@ -55,6 +55,8 @@ export interface RepresentativeResponse {
   cellPhone?: string;
   destinationId: number;
   destinationName: string;
+  representativeType?: number;
+  contractEndDate?: string | null;
 }
 
 // Requests

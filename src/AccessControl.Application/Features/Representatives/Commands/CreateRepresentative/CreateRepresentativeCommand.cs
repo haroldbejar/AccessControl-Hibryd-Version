@@ -11,9 +11,11 @@ public sealed record CreateRepresentativeCommand(
     string? CellPhone,
     int DestinationId,
     bool HasVehicle,
-    VehicleTypeEnum VehicleTypeId,
+    int? VehicleTypeId,
     string? Brand,
     string? Model,
     string? Color,
-    string? Plate
+    string? Plate,
+    int RepresentativeType,
+    DateOnly? ContractEndDate
 ) : IRequest<Result<RepresentativeResponse>>;

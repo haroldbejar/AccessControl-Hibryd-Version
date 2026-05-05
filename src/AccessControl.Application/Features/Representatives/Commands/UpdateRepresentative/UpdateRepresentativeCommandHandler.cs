@@ -2,6 +2,7 @@ using AccessControl.Application.Common.Mappings;
 using AccessControl.Application.Common.Models;
 using AccessControl.Application.Features.Representatives.Dtos;
 using AccessControl.Domain.Entities;
+using AccessControl.Domain.Enums;
 using AccessControl.Domain.Exceptions;
 using AccessControl.Domain.Interfaces;
 using MediatR;
@@ -31,11 +32,13 @@ public sealed class UpdateRepresentativeCommandHandler : IRequestHandler<UpdateR
         representative.DestinationId = request.DestinationId;
         representative.Destination = destination;
         representative.HasVehicle = request.HasVehicle;
-        representative.VehicleTypeId = request.VehicleTypeId;
+        representative.VehicleTypeId = (VehicleTypeEnum)(request.VehicleTypeId ?? (int)VehicleTypeEnum.NA);
         representative.Brand = request.Brand?.Trim();
         representative.Model = request.Model?.Trim();
         representative.Color = request.Color?.Trim();
         representative.Plate = request.Plate?.Trim();
+        representative.RepresentativeType = (RepresentativeTypeEnum)request.RepresentativeType;
+        representative.ContractEndDate = request.ContractEndDate;
 
         await _uow.Representatives.UpdateAsync(representative, cancellationToken);
         await _uow.SaveChangesAsync(cancellationToken);
