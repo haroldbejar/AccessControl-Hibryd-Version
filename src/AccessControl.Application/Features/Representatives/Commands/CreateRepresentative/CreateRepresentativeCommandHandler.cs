@@ -2,6 +2,7 @@ using AccessControl.Application.Common.Mappings;
 using AccessControl.Application.Common.Models;
 using AccessControl.Application.Features.Representatives.Dtos;
 using AccessControl.Domain.Entities;
+using AccessControl.Domain.Enums;
 using AccessControl.Domain.Exceptions;
 using AccessControl.Domain.Interfaces;
 using MediatR;
@@ -30,11 +31,13 @@ public sealed class CreateRepresentativeCommandHandler : IRequestHandler<CreateR
             CellPhone = request.CellPhone?.Trim(),
             DestinationId = request.DestinationId,
             HasVehicle = request.HasVehicle,
-            VehicleTypeId = request.VehicleTypeId,
+            VehicleTypeId = (VehicleTypeEnum)(request.VehicleTypeId ?? (int)VehicleTypeEnum.NA),
             Brand = request.Brand?.Trim(),
             Model = request.Model?.Trim(),
             Color = request.Color?.Trim(),
             Plate = request.Plate?.Trim(),
+            RepresentativeType = (RepresentativeTypeEnum)request.RepresentativeType,
+            ContractEndDate = request.ContractEndDate,
             Destination = destination
         };
 

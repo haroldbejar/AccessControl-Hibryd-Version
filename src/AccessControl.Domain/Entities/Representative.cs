@@ -44,6 +44,21 @@ namespace AccessControl.Domain.Entities
         [MaxLength(20)]
         public string? Plate { get; set; }
 
+        // Tipo de representante y datos de contrato
+        public RepresentativeTypeEnum RepresentativeType { get; set; } = RepresentativeTypeEnum.Owner;
+        public DateOnly? ContractEndDate { get; set; }
+
+        [NotMapped]
+        public string RepresentativeTypeDescription => RepresentativeType switch
+        {
+            RepresentativeTypeEnum.Owner => "Propietario",
+            RepresentativeTypeEnum.Tenant => "Arrendatario",
+            _ => "Desconocido"
+        };
+
+        [NotMapped]
+        public bool Visible => !Eliminated;
+
         // Relaciones
         public virtual ICollection<Visit> Visits { get; set; } = new List<Visit>();
         public virtual ICollection<Package> Packages { get; set; } = new List<Package>();

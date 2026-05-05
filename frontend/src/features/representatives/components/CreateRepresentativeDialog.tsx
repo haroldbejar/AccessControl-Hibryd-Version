@@ -22,6 +22,7 @@ import {
   VehicleTypeEnum,
   vehicleTypeLabels,
 } from "@/features/visits/types/visit.types";
+import { RepresentativeTypeEnum } from "../types/representative.types";
 import type { DestinationResponse } from "@/features/destinations/types/destination.types";
 import { useCreateRepresentative } from "../hooks/useRepresentatives";
 
@@ -40,6 +41,8 @@ const schema = z
     model: z.string().max(50).optional().or(z.literal("")),
     color: z.string().max(30).optional().or(z.literal("")),
     plate: z.string().max(20).optional().or(z.literal("")),
+    representativeType: z.number().min(1, "Seleccione el tipo"),
+    contractEndDate: z.string().nullable().optional(),
   })
   .refine(
     (d) =>
@@ -88,12 +91,15 @@ export function CreateRepresentativeDialog({
       model: "",
       color: "",
       plate: "",
+      representativeType: RepresentativeTypeEnum.Owner,
+      contractEndDate: null,
     },
   });
 
   const hasVehicle = watch("hasVehicle");
   const destinationId = watch("destinationId");
   const vehicleTypeId = watch("vehicleTypeId");
+  const representativeType = watch("representativeType");
 
   const handleClose = () => {
     reset();
@@ -114,6 +120,8 @@ export function CreateRepresentativeDialog({
       model: data.hasVehicle ? data.model || undefined : undefined,
       color: data.hasVehicle ? data.color || undefined : undefined,
       plate: data.hasVehicle ? data.plate || undefined : undefined,
+      representativeType: data.representativeType,
+      contractEndDate: data.contractEndDate || null,
     });
   };
 
@@ -143,6 +151,44 @@ export function CreateRepresentativeDialog({
               <p className="text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
+
+          {/* Tipo de representante */}
+          <div className="space-y-1.5">
+            <Label>Tipo de representante *</Label>
+            <Select
+              value={representativeType.toString()}
+              onValueChange={(v) => {
+                setValue("representativeType", Number(v));
+                if (Number(v) !== RepresentativeTypeEnum.Tenant) {
+                  setValue("contractEndDate", null);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={RepresentativeTypeEnum.Owner.toString()}>
+                  Propietario
+                </SelectItem>
+                <SelectItem value={RepresentativeTypeEnum.Tenant.toString()}>
+                  Arrendatario
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Fecha fin de contrato (solo Arrendatario) */}
+          {representativeType === RepresentativeTypeEnum.Tenant && (
+            <div className="space-y-1.5">
+              <Label htmlFor="rep-contract-end">Fecha fin de contrato</Label>
+              <Input
+                id="rep-contract-end"
+                type="date"
+                {...register("contractEndDate")}
+              />
+            </div>
+          )}
 
           {/* Destinatario */}
           <div className="space-y-1.5">

@@ -97,6 +97,7 @@ export function RepresentativesPage() {
           <thead className="bg-muted/50">
             <tr>
               <th className="text-left px-4 py-3 font-medium">Nombre</th>
+              <th className="text-left px-4 py-3 font-medium">Tipo</th>
               <th className="text-left px-4 py-3 font-medium">Teléfono</th>
               <th className="text-left px-4 py-3 font-medium">Celular</th>
               <th className="text-left px-4 py-3 font-medium">Vehículo</th>
@@ -107,7 +108,7 @@ export function RepresentativesPage() {
             {!selectedDestinationId ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="text-center py-10 text-muted-foreground"
                 >
                   Selecciona un destinatario para ver sus representantes
@@ -116,7 +117,7 @@ export function RepresentativesPage() {
             ) : isLoading ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="text-center py-10 text-muted-foreground"
                 >
                   Cargando...
@@ -125,7 +126,7 @@ export function RepresentativesPage() {
             ) : representatives.length === 0 ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="text-center py-10 text-muted-foreground"
                 >
                   Sin representantes para este destinatario
@@ -138,6 +139,25 @@ export function RepresentativesPage() {
                   className="border-t hover:bg-muted/30 transition-colors"
                 >
                   <td className="px-4 py-3 font-medium">{r.name}</td>
+                  <td className="px-4 py-3">
+                    <Badge
+                      variant={
+                        r.representativeType === 2 ? "outline" : "secondary"
+                      }
+                      className={
+                        r.representativeType === 2
+                          ? "border-amber-400 text-amber-700 dark:text-amber-400"
+                          : ""
+                      }
+                    >
+                      {r.representativeTypeDescription}
+                    </Badge>
+                    {r.representativeType === 2 && r.contractEndDate && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Vence: {r.contractEndDate}
+                      </p>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {r.phone ?? "—"}
                   </td>
@@ -147,8 +167,9 @@ export function RepresentativesPage() {
                   <td className="px-4 py-3">
                     {r.hasVehicle ? (
                       <Badge variant="secondary">
-                        {vehicleTypeLabels[r.vehicleTypeId] ??
-                          vehicleTypeLabels[VehicleTypeEnum.NA]}
+                        {vehicleTypeLabels[
+                          r.vehicleTypeId as VehicleTypeEnum
+                        ] ?? vehicleTypeLabels[VehicleTypeEnum.NA]}
                       </Badge>
                     ) : (
                       <span className="text-muted-foreground">

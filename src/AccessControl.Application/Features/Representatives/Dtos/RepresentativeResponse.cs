@@ -10,9 +10,13 @@ public sealed record RepresentativeResponse(
     int DestinationId,
     string DestinationName,
     bool HasVehicle,
-    VehicleTypeEnum VehicleTypeId,
+    int? VehicleTypeId,
     string? Brand,
     string? Model,
     string? Color,
-    string? Plate
+    string? Plate,
+    int RepresentativeType,
+    string RepresentativeTypeDescription,
+    DateOnly? ContractEndDate,
+    bool Visible
 );

@@ -25,6 +25,7 @@ import {
 } from "@/features/visits/types/visit.types";
 import type { DestinationResponse } from "@/features/destinations/types/destination.types";
 import type { RepresentativeResponse } from "../types/representative.types";
+import { RepresentativeTypeEnum } from "../types/representative.types";
 import { useUpdateRepresentative } from "../hooks/useRepresentatives";
 
 const schema = z
@@ -42,6 +43,8 @@ const schema = z
     model: z.string().max(50).optional().or(z.literal("")),
     color: z.string().max(30).optional().or(z.literal("")),
     plate: z.string().max(20).optional().or(z.literal("")),
+    representativeType: z.number().min(1, "Seleccione el tipo"),
+    contractEndDate: z.string().nullable().optional(),
   })
   .refine(
     (d) =>
@@ -85,11 +88,14 @@ export function EditRepresentativeDialog({
       cellPhone: representative.cellPhone ?? "",
       destinationId: representative.destinationId,
       hasVehicle: representative.hasVehicle,
-      vehicleTypeId: representative.vehicleTypeId,
+      vehicleTypeId: representative.vehicleTypeId ?? VehicleTypeEnum.NA,
       brand: representative.brand ?? "",
       model: representative.model ?? "",
       color: representative.color ?? "",
       plate: representative.plate ?? "",
+      representativeType:
+        representative.representativeType ?? RepresentativeTypeEnum.Owner,
+      contractEndDate: representative.contractEndDate ?? null,
     },
   });
 
@@ -100,17 +106,21 @@ export function EditRepresentativeDialog({
       cellPhone: representative.cellPhone ?? "",
       destinationId: representative.destinationId,
       hasVehicle: representative.hasVehicle,
-      vehicleTypeId: representative.vehicleTypeId,
+      vehicleTypeId: representative.vehicleTypeId ?? VehicleTypeEnum.NA,
       brand: representative.brand ?? "",
       model: representative.model ?? "",
       color: representative.color ?? "",
       plate: representative.plate ?? "",
+      representativeType:
+        representative.representativeType ?? RepresentativeTypeEnum.Owner,
+      contractEndDate: representative.contractEndDate ?? null,
     });
   }, [representative, reset]);
 
   const hasVehicle = watch("hasVehicle");
   const destinationId = watch("destinationId");
   const vehicleTypeId = watch("vehicleTypeId");
+  const representativeType = watch("representativeType");
 
   const onSubmit = (data: FormData) => {
     updateRepresentative.mutate({
@@ -127,6 +137,8 @@ export function EditRepresentativeDialog({
       model: data.hasVehicle ? data.model || undefined : undefined,
       color: data.hasVehicle ? data.color || undefined : undefined,
       plate: data.hasVehicle ? data.plate || undefined : undefined,
+      representativeType: data.representativeType,
+      contractEndDate: data.contractEndDate || null,
     });
   };
 
@@ -156,6 +168,46 @@ export function EditRepresentativeDialog({
               <p className="text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
+
+          {/* Tipo de representante */}
+          <div className="space-y-1.5">
+            <Label>Tipo de representante *</Label>
+            <Select
+              value={representativeType.toString()}
+              onValueChange={(v) => {
+                setValue("representativeType", Number(v));
+                if (Number(v) !== RepresentativeTypeEnum.Tenant) {
+                  setValue("contractEndDate", null);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={RepresentativeTypeEnum.Owner.toString()}>
+                  Propietario
+                </SelectItem>
+                <SelectItem value={RepresentativeTypeEnum.Tenant.toString()}>
+                  Arrendatario
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Fecha fin de contrato (solo Arrendatario) */}
+          {representativeType === RepresentativeTypeEnum.Tenant && (
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-rep-contract-end">
+                Fecha fin de contrato
+              </Label>
+              <Input
+                id="edit-rep-contract-end"
+                type="date"
+                {...register("contractEndDate")}
+              />
+            </div>
+          )}
 
           {/* Destinatario */}
           <div className="space-y-1.5">

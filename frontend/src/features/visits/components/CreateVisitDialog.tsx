@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { VehicleTypeEnum } from "../types/visit.types";
+import { RepresentativeTypeEnum } from "@/features/representatives/types/representative.types";
 import {
   useCreateVisit,
   useDestinations,
@@ -95,6 +96,10 @@ export function CreateVisitDialog({ open, onClose }: Props) {
   });
 
   const hasVehicle = watch("hasVehicle");
+  const representativeId = watch("representativeId");
+  const selectedRepresentative = representatives.find(
+    (r) => r.id === representativeId,
+  );
 
   useEffect(() => {
     if (!open) {
@@ -251,6 +256,17 @@ export function CreateVisitDialog({ open, onClose }: Props) {
               <p className="text-xs text-destructive">
                 {errors.representativeId.message}
               </p>
+            )}
+            {selectedRepresentative?.representativeType ===
+              RepresentativeTypeEnum.Tenant && (
+              <div className="flex items-center gap-2 mt-1 px-3 py-1.5 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-400 text-xs">
+                <span className="font-medium">Arrendatario</span>
+                {selectedRepresentative.contractEndDate && (
+                  <span>
+                    — Contrato vence: {selectedRepresentative.contractEndDate}
+                  </span>
+                )}
+              </div>
             )}
           </div>
 

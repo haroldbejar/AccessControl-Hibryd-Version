@@ -1,4 +1,15 @@
-import type { VehicleTypeEnum } from "@/features/visits/types/visit.types";
+export const RepresentativeTypeEnum = {
+  Owner: 1,
+  Tenant: 2,
+} as const;
+export type RepresentativeTypeEnum =
+  (typeof RepresentativeTypeEnum)[keyof typeof RepresentativeTypeEnum];
+
+export const representativeTypeLabels: Record<RepresentativeTypeEnum, string> =
+  {
+    [RepresentativeTypeEnum.Owner]: "Propietario",
+    [RepresentativeTypeEnum.Tenant]: "Arrendatario",
+  };
 
 export interface RepresentativeResponse {
   id: number;
@@ -8,11 +19,15 @@ export interface RepresentativeResponse {
   destinationId: number;
   destinationName: string;
   hasVehicle: boolean;
-  vehicleTypeId: VehicleTypeEnum;
+  vehicleTypeId: number | null;
   brand?: string;
   model?: string;
   color?: string;
   plate?: string;
+  representativeType: RepresentativeTypeEnum;
+  representativeTypeDescription: string;
+  contractEndDate?: string | null;
+  visible: boolean;
 }
 
 export interface CreateRepresentativeRequest {
@@ -21,11 +36,13 @@ export interface CreateRepresentativeRequest {
   cellPhone?: string;
   destinationId: number;
   hasVehicle: boolean;
-  vehicleTypeId: VehicleTypeEnum;
+  vehicleTypeId: number | null;
   brand?: string;
   model?: string;
   color?: string;
   plate?: string;
+  representativeType: number;
+  contractEndDate?: string | null;
 }
 
 export interface UpdateRepresentativeRequest {
@@ -35,9 +52,11 @@ export interface UpdateRepresentativeRequest {
   cellPhone?: string;
   destinationId: number;
   hasVehicle: boolean;
-  vehicleTypeId: VehicleTypeEnum;
+  vehicleTypeId: number | null;
   brand?: string;
   model?: string;
   color?: string;
   plate?: string;
+  representativeType: number;
+  contractEndDate?: string | null;
 }
