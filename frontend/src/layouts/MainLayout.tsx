@@ -5,7 +5,6 @@ import {
   Users,
   Package,
   LogOut,
-  Shield,
   UserCog,
   Building2,
   ContactRound,
@@ -94,10 +93,14 @@ export function MainLayout() {
             collapsed ? "justify-center px-0 py-5" : "gap-2 px-6 py-5"
           }`}
         >
-          <Shield className="h-6 w-6 text-primary shrink-0" />
+          <img
+            src="/GateX_Titanium_Logo_v2.svg"
+            alt="GateX"
+            className="h-10 w-10 object-contain shrink-0"
+          />
           {!collapsed && (
             <span className="font-semibold text-lg whitespace-nowrap overflow-hidden">
-              Access Control
+              GateX
             </span>
           )}
         </div>

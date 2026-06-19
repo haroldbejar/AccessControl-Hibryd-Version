@@ -158,7 +158,7 @@ export const ReportLayout = ({
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.headerTitle}>Access Control</Text>
+          <Text style={styles.headerTitle}>GateX</Text>
           <Text style={styles.headerSubtitle}>{title}</Text>
           {subtitle ? (
             <Text style={styles.headerSubtitle}>{subtitle}</Text>

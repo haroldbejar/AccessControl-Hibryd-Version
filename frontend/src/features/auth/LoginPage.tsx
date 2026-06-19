@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { authService } from "./api/authService";
@@ -56,9 +56,13 @@ export function LoginPage() {
         {/* Logo */}
         <div className="flex flex-col items-center gap-2 mb-8">
           <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10">
-            <Shield className="h-6 w-6 text-primary" />
+            <img
+              src="/GateX_Titanium_Logo_v2.svg"
+              alt="GateX"
+              className="h-10 w-10 object-contain"
+            />
           </div>
-          <h1 className="text-2xl font-bold">Access Control</h1>
+          <h1 className="text-2xl font-bold">GateX</h1>
           <p className="text-sm text-muted-foreground">
             Ingresa tus credenciales para continuar
           </p>
